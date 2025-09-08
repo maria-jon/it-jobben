@@ -32,3 +32,4 @@ Kontraktet kan komma att ändras/byggas på i samband med start av kodsprinten.
 
 - Agnes Wilson
 - Antonina Dulama
+- Maria Jonasson
