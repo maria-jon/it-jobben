@@ -1,18 +1,42 @@
 import type { Job } from "../models/Job";
 
+import { DigiInfoCardMulti, DigiTypography, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
+import { InfoCardMultiHeadingLevel, InfoCardMultiType, TypographyTimeVariation, TypographyVariation } from "@digi/arbetsformedlingen";
+
 type JobCardProps = {
     job: Job;
 }
 
 export const JobCard = ({ job }: JobCardProps) => {
-
     return(
         <>
-            <h2>{job.headline}</h2>
-            <h3>{job.employer.name}</h3>
-            <p>{job.occupation.label}</p>
-            <p>Sista ansökningsdag: {job.application_deadline}</p>
-            <p>Publicerat: {job.publication_date}</p>
+            <DigiInfoCardMulti
+                afHeading={job.headline}
+                afHeadingLevel={InfoCardMultiHeadingLevel.H2}
+                afType={InfoCardMultiType.ENTRY}
+                afLinkHref="/"        
+            >
+                <DigiTypography
+                    afVariation={TypographyVariation.SMALL}
+                >
+                    <h3>{job.employer.name}</h3>
+                    <p>{job.occupation.label}</p>
+                    <p>
+                        <span>Publicerad: </span> 
+                        <DigiTypographyTime
+                            afVariation={TypographyTimeVariation.PRETTY}
+                            afDateTime={job.publication_date}
+                        />
+                    </p>
+                    <p>
+                        <span>Sista ansökningsdag: </span>
+                        <DigiTypographyTime
+                            afVariation={TypographyTimeVariation.PRETTY}
+                            afDateTime={job.application_deadline}
+                        />
+                    </p>
+                </DigiTypography>
+            </DigiInfoCardMulti>
         </>
     )
 }
