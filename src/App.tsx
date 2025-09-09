@@ -1,7 +1,10 @@
 import "./App.css";
+import { getJobs } from "./services/jobService";
 
 function App() {
-  return <></>;
+  return <>
+  <button onClick={getJobs}></button>
+  </>;
 }
 
 export default App;
