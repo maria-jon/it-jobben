@@ -21,7 +21,7 @@ export default function SearchPage() {
 
   return (
     <>
-      <h1>Search Page</h1>
+      <h1>Sök jobb</h1>
       {jobs.map((j) => (
         <JobCard key={j.id} job={j} />
       ))}
