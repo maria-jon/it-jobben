@@ -25,8 +25,14 @@ export default function StartPage() {
   }
 
   return (
-    <section>
-      <h1>Start Page</h1>
+    <section className="hero">
+      <h1>Platsbanken</h1>
+      <p>Hitta ditt nästa jobb som utvecklare</p>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus luctus
+        urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis
+        porta.
+      </p>
 
       <form onSubmit={onSubmit} role="search" aria-label="Job search">
         <DigiFormInputSearch
