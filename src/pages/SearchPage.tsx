@@ -4,6 +4,7 @@ import type { Job } from "../models/Job";
 import { getJobs } from "../services/jobService";
 import { HandleSorting } from "../components/HandleSorting";
 
+
 export default function SearchPage() {
   const [jobs, setJobs] = useState<Job[]>(
     JSON.parse(localStorage.getItem("jobs") || "[]"),
