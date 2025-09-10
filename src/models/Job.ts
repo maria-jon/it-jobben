@@ -38,7 +38,9 @@ export type Job = {
         information: string;
         reference: string; 
         email: string;
+        via_af: boolean;
         url: string;
+        other: string;
     }
     experience_required: boolean;
     access_to_own_car: boolean;
