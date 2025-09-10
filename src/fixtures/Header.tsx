@@ -5,7 +5,7 @@ export const Header = () => {
 
     return (
         <DigiHeader
-            afSystemName="IT-platsbanken"
+            afSystemName="IT-jobben"
             afHideSystemName={false}
             afMenuButtonText="Meny"
         >
