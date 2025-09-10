@@ -5,9 +5,10 @@ import type { AfResponse } from "../models/AfResponse";
 import type { Job } from "../models/Job";
 import { get } from "./serviceBase";
 
-export const getJobs = async () => {
+export const getJobs = async (queryParams?: string): Promise<Job[]> => {
     try {
-        const data = await get<AfResponse>(baseURL);
+        const url = queryParams ? `${baseURL}${queryParams}` : baseURL;
+        const data = await get<AfResponse>(url);
         console.log(data.hits)
         return data.hits;
     } catch {

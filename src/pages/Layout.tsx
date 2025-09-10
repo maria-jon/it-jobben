@@ -1,5 +1,5 @@
 import { Outlet } from "react-router"
-import { Header } from "../fixtures/header"
+import { Header } from "../fixtures/Header"
 import { Footer } from "../fixtures/Footer"
 
 export const Layout = () => {
