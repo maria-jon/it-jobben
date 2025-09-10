@@ -51,8 +51,20 @@ export type Job = {
         coordinates: [];
     }
     must_have: {
-        skills: [];
-        languages: [];
+        skills: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+        languages: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
         work_experiences: [
             {
                 concept_id: string;
@@ -60,9 +72,58 @@ export type Job = {
                 legacy_ams_taxonomy_id: string;    
             }
         ];
-        education: [];
-        education_level: [];
+        education: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+        education_level: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
     }
+    nice_to_have: {
+        skills: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+        languages: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+        work_experiences: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+        education: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+        education_level: [
+            {
+                concept_id: string;
+                label: string;
+                legacy_ams_taxonomy_id: string;    
+            }
+        ];
+    }    
     application_contacts: [
         {
             name: string;
