@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import { getJobById } from "../services/jobService";
 import type { Job } from "../models/Job";
 
-
 import { DigiInfoCard, DigiLayoutBlock, DigiLayoutContainer, DigiLink, DigiLinkExternal, DigiTypography, DigiTypographyMeta, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
 import { InfoCardBorderPosition, InfoCardHeadingLevel, InfoCardType, InfoCardVariation, LayoutBlockVariation, TypographyMetaVariation, TypographyTimeVariation } from "@digi/arbetsformedlingen";
 
 /** Helper for conditional rendering
-   * Takes value and only renders element if value exists
-  */
+ * Takes value and only renders element if value exists
+*/
 type InfoProps = { value?: string | null };
 
 const Info = ({ value }: InfoProps) => {
@@ -52,6 +51,50 @@ export default function AdPage() {
 
   localStorage.setItem("job", JSON.stringify(job));
 
+  type ApplicationDetails = Job["application_details"];
+  type AppItem = {
+    key: keyof ApplicationDetails;
+    label: string;
+    description?: string;
+    value: string;
+    href?: string; 
+  };
+
+  /** Helper for application details
+   * create conditional rendering to show correct information depending on application_details
+  */
+  const decideApplicationDetails = (a?: ApplicationDetails): AppItem | undefined => {
+    if (!a) return;
+
+    const clean = (v?: string | null) => (typeof v === "string" ? v.trim() : "");
+    const order: (keyof ApplicationDetails)[] = ["url", "email", "information", "other", "reference", "via_af"];
+
+    for (const key of order) {
+      const val = a[key];
+
+      if (typeof val === "string") {
+        const v = clean(val);
+        if (!v) continue;
+
+        if (key === "email") return {key, label: `${v}`, description: "Maila din ansökan till", value: v, href: `mailto:${v}` };
+        if (key === "url")   return { key, label: "Ansök här", description: "Ansök via arbetsgivarens webbplats", value: v, href: v };
+
+        const label = 
+        key === "information" ? "Ansökningsinfo" :
+        key === "other"       ? "Övrigt" :
+        /* reference */         "Referens";
+
+        return { key, label, value: v };
+      }
+
+      if (key === "via_af" && val === true) {
+        return { key, label: "Via Arbetsförmedlingen", description: "Ansök via AF-portalen", value: "Ansök via AF-portalen" };
+      }
+    }
+
+    return;
+  }
+  const item = decideApplicationDetails(job.application_details);
 
   return (
     <>
@@ -84,8 +127,8 @@ export default function AdPage() {
               <Info value={job?.employment_type?.label} />
             </p>
           </DigiLayoutContainer>
-          {/* TODO 
-          * fix conditional rendering to only show this if there are must haves
+          {/** TODO 
+           * fix conditional rendering to only show this if there are must haves
           */}
           {!!job.must_have && (
             <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
@@ -181,16 +224,12 @@ export default function AdPage() {
               </DigiLinkExternal>
             </p>
           </DigiLayoutContainer>
-          {/* TODO 
-          * create conditional rendering to show correct information depending on application_details
-          * (application via email, url, etc)
-          */}
           <DigiInfoCard
             afHeading="Sök jobbet"
             afHeadingLevel={InfoCardHeadingLevel.H2}
             afType={InfoCardType.RELATED}
-            afLinkHref={job.application_details.url}	
-            afLinkText="Sök jobbet"	
+            afLinkHref={item?.href}	
+            afLinkText={item?.label}	
             afVariation={InfoCardVariation.SECONDARY}	
             afBorderPosition={InfoCardBorderPosition.TOP}
           >
@@ -209,6 +248,7 @@ export default function AdPage() {
                   />)
                 </span>
             </p>
+            <p>{item?.description}</p>
           </DigiInfoCard>
         </DigiTypography>
       </DigiLayoutBlock>
