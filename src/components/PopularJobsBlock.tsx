@@ -53,7 +53,7 @@ export default function PopularJobsBlock() {
       aria-labelledby="popular-dev-heading"
       style={{ marginTop: "2rem" }}
     >
-      <h2 id="popular-dev-heading">Flest annonser just nu (IT)</h2>
+      <h2 id="popular-dev-heading">Flest annonser just nu </h2>
       <div
         style={{
           display: "grid",

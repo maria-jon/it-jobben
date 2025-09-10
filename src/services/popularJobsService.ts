@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const jobURL = import.meta.env.VITE_JOB_URL as string;
+
+const baseURL = import.meta.env.VITE_BASE_URL as string;
 
 export async function getJobCountFor(term: string): Promise<number> {
-  const url = `${jobURL}?q=${encodeURIComponent(term)}&limit=0`;
+  const url = `${baseURL}?q=${encodeURIComponent(term)}&limit=0`;
   const { data } = await axios.get(url);
   return data?.total?.value ?? 0;
 }
