@@ -1,4 +1,3 @@
-import "./App.css";
 import { getJobById, getJobs } from "./services/jobService";
 
 // Hard coded id and buttons to fetch all job ads 
