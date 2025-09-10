@@ -1,3 +1,12 @@
+/*
+type WorkExperience = {
+    concept_id: string;
+    label: string;
+    legacy_ams_taxonomy_id: string;    
+};
+WorkExperience[];
+*/
+
 export type Job = {
     id: string;
     headline: string;
