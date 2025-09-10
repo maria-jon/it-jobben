@@ -1,18 +1,15 @@
-/* this removes the AF logo for now */
-/* LMaybe not the greatest solution but let it be like this fo now :)   */
-digi-header .digi-logo__img.sc-digi-logo {
+.digi-logo__img.sc-digi-logo {
   display: none !important;
 }
 
-
-body {
-    margin: 0;
+.sc-digi-header-navigation-item-h.sc-digi-header-navigation-item-s>a, .sc-digi-header-navigation-item-h.sc-digi-header-navigation-item-s>a:hover, .sc-digi-header-navigation-item-h.sc-digi-header-navigation-item-s>a:hover+.digi-header-navigation-item-indicator, .sc-digi-header-navigation-item-h.sc-digi-header-navigation-item-s>a:hover+.digi-header-navigation-item-indicator--active, .sc-digi-header-navigation-item-h .sc-digi-header-navigation-item-s>a:hover+.digi-header-navigation-item-indicator--active {
+    --INDICATOR-COLOR: #bc01c5;
 }
 
-.my-footer {
-  position: fixed; 
-  bottom: 0;
-  width: 100%;
-  height: 80px;
-  background-color: pink;
+.digi-header-navigation-item-indicator--active.sc-digi-header-navigation-item {
+    --INDICATOR-COLOR: #8d0094;
+}
+
+.sc-digi-layout-block-h .digi-layout-block--profile.sc-digi-layout-block {
+    --BACKGROUND: #6b0071;
 }
