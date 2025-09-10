@@ -14,7 +14,7 @@ export const JobCard = ({ job }: JobCardProps) => {
                 afHeading={job.headline}
                 afHeadingLevel={InfoCardMultiHeadingLevel.H2}
                 afType={InfoCardMultiType.ENTRY}
-                afLinkHref="/"        
+                afLinkHref={`/ad/${job.id}`}        
             >
                 <DigiTypography
                     afVariation={TypographyVariation.SMALL}
