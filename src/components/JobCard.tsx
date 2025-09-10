@@ -25,6 +25,7 @@ export const JobCard = ({ job }: JobCardProps) => {
                         <span>Publicerad: </span> 
                         <DigiTypographyTime
                             afVariation={TypographyTimeVariation.PRETTY}
+                            afLocale="sv-SE"
                             afDateTime={job.publication_date}
                         />
                     </p>
@@ -32,6 +33,7 @@ export const JobCard = ({ job }: JobCardProps) => {
                         <span>Sista ansökningsdag: </span>
                         <DigiTypographyTime
                             afVariation={TypographyTimeVariation.PRETTY}
+                            afLocale="sv-SE"
                             afDateTime={job.application_deadline}
                         />
                     </p>
