@@ -1,12 +1,42 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getJobById } from "../services/jobService";
+import type { Job } from "../models/Job";
 
-import { DigiLayoutBlock, DigiLink, DigiTypography } from "@digi/arbetsformedlingen-react";
-import { LayoutBlockVariation } from "@digi/arbetsformedlingen";
+
+import { DigiLayoutBlock, DigiLink, DigiTypography, DigiTypographyMeta, DigiTypographyPreamble } from "@digi/arbetsformedlingen-react";
+import { LayoutBlockVariation, TypographyMetaVariation } from "@digi/arbetsformedlingen";
 
 export default function AdPage() {
   const navigate = useNavigate();
 
-  const { id } = useParams();
+  // Find ID
+  const { id: adId } = useParams<{ id: string }>();
+  const id = adId ? decodeURIComponent(adId).trim() : "";
+
+  const [job, setJob] = useState<Job>(
+    JSON.parse(localStorage.getItem("job") || "[]"),
+  );
+  const [hasFetched, setHasFetched] = useState(false);
+  
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const job = await getJobById(id);
+        setJob(job);
+      } catch {
+        throw new Error (`Kan inte hitta annons med id ${id}`)
+      } finally {
+        setHasFetched(true);
+      }
+    }
+    if(hasFetched) return;
+
+    getData();
+  });
+
+  localStorage.setItem("job", JSON.stringify(job));
+
   return (
     <>
       <DigiLink
@@ -19,11 +49,39 @@ export default function AdPage() {
       </DigiLink>
       <DigiLayoutBlock afVariation={LayoutBlockVariation.PRIMARY}>
         <DigiTypography>
-          <h2>Rubrik för annons {id}</h2>
+          <h2>{job.headline}</h2>
+          <h3>{job.employer.name}</h3>
+          <DigiTypographyPreamble>
+            Jag är en ingress. Använd mig direkt efter huvudrubrik.
+          </DigiTypographyPreamble>
+          <DigiTypographyMeta
+            afVariation={TypographyMetaVariation.PRIMARY}
+          >
+            <p>
+            {job.occupation.label}
+            </p>
+            <p slot="secondary">
+              {job.workplace_address.municipality || job.workplace_address.country}
+            </p>
+          </DigiTypographyMeta>
+          {/* TODO 
+          * create conditional rendering to only show this if there are must haves
+          * render work_experiences
+          */}
+          <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
+            <DigiTypography>
+            <h3>Kvalifikationer</h3>
+            <p>
+              {job.must_have.skills}
+              {job.must_have.languages}
+              {/*job.must_have.work_experiences*/}
+              {job.must_have.education}
+              {job.must_have.education_level}
+            </p>
+            </DigiTypography>
+          </DigiLayoutBlock>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam magna neque, interdum vel massa eget, 
-            condimentum rutrum velit. Sed vitae ullamcorper sem. Aliquam malesuada nunc sed purus mollis scelerisque. 
-            Curabitur bibendum leo quis ante porttitor tincidunt. Nam tincidunt imperdiet tortor eu suscipit. Maecenas ut dui est.
+            {job.description.text}
           </p>
         </DigiTypography>
       </DigiLayoutBlock>
