@@ -74,16 +74,59 @@ export default function AdPage() {
           * create conditional rendering to only show this if there are must haves
           * render work_experiences
           */}
-          <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
-              <h3>Kvalifikationer</h3>
-              <p>
-                {job.must_have.skills}
-                {job.must_have.languages}
-                {/*job.must_have.work_experiences*/}
-                {job.must_have.education}
-                {job.must_have.education_level}
-              </p>
-          </DigiLayoutBlock>
+          {!!job.must_have && (
+            <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
+                <h3>Krav</h3>
+                {!!job.must_have?.work_experiences?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Arbetslivserfarenhet</h4>
+                    <ul>
+                      {job.must_have.work_experiences.map((we) => (
+                        <li key={we.concept_id || we.label}>
+                          {we.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+                {!!job.must_have?.skills?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Kompetenser</h4>
+                    <ul>
+                      {job.must_have.skills.map((s) => (
+                        <li key={s.concept_id || s.label}>
+                          {s.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+                {!!job.must_have?.languages?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Språk</h4>
+                    <ul>
+                      {job.must_have.languages.map((l) => (
+                        <li key={l.concept_id || l.label}>
+                          {l.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+                {!!job.must_have?.education?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Utbildning</h4>
+                    <ul>
+                      {job.must_have.education.map((e) => (
+                        <li key={e.concept_id || e.label}>
+                          {e.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+            </DigiLayoutBlock>
+          )}
           <DigiLayoutContainer afVerticalPadding afNoGutter>
             <h3>Om jobbet</h3>
             <p>
