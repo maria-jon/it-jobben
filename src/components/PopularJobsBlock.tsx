@@ -1,25 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getJobCounts } from "../services/popularJobsService";
+import { getCountForQuery } from "../services/popularJobsService";
 
-type Item = { term: string; count: number };
+type Item = { label: string; qp: string; count?: number };
 
-const DEV_TERMS: string[] = [
-  "programmerare",
-  "utvecklare",
-  "systemutvecklare",
-  "frontend",
-  "backend",
-  "fullstack",
-  "JavaScript",
-  "TypeScript",
-  "Java",
-  "C#",
-  "Python",
-  "DevOps",
-  "Cloud",
-  "Data engineer",
-  "QA",
+const ITEMS: Item[] = [
+  { label: "Mjukvaru- & systemutvecklare m.fl.", qp: "occupation-group=2512" },
+  { label: "Systemtestare & testledare", qp: "occupation-group=2514" },
+  { label: "IT-säkerhetsspecialister", qp: "occupation-group=2516" },
+  { label: "Webbmaster/webbadm.", qp: "occupation-group=3515" },
 ];
 
 export default function PopularJobsBlock() {
@@ -30,8 +19,13 @@ export default function PopularJobsBlock() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getJobCounts(DEV_TERMS);
-        setItems(data);
+        const withCounts = await Promise.all(
+          ITEMS.map(async (it) => ({
+            ...it,
+            count: await getCountForQuery(it.qp),
+          }))
+        );
+        setItems(withCounts);
       } catch {
         setError("Kunde inte hämta annonsstatistik just nu.");
       } finally {
@@ -57,25 +51,25 @@ export default function PopularJobsBlock() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "0.75rem",
-          marginTop: "0.5rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+          gap: ".75rem",
+          marginTop: ".5rem",
         }}
       >
-        {items.map(({ term, count }) => (
+        {items.map(({ label, qp, count }) => (
           <Link
-            key={term}
-            to={`/search?q=${encodeURIComponent(term)}`}
-            aria-label={`Visa ${count} annonser för ${term}`}
+            key={label}
+            to={`/search?${qp}&sort=pubdate-desc`}
+            aria-label={`Visa ${count ?? 0} annonser: ${label}`}
             style={{
               display: "block",
-              padding: "0.5rem 0.75rem",
+              padding: ".5rem .75rem",
               border: "1px solid #ccc",
-              borderRadius: "0.5rem",
+              borderRadius: ".5rem",
               textDecoration: "none",
             }}
           >
-            {term} {count ? `(${count})` : ""}
+            {label} {count ? `(${count})` : ""}
           </Link>
         ))}
       </div>

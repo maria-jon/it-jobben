@@ -1,21 +1,20 @@
-import axios from "axios";
-
+import { get } from "./serviceBase";
+import type { AfResponse } from "../models/AfResponse";
 
 const baseURL = import.meta.env.VITE_BASE_URL as string;
 
-export async function getJobCountFor(term: string): Promise<number> {
-  const joinChar = baseURL.includes("?") ? "&" : "?";
-  const url = `${baseURL}${joinChar}q=${encodeURIComponent(term)}&limit=0`;
-  const { data } = await axios.get(url);
-  return data?.total?.value ?? 0;
+function joinUrl(base: string, extra?: string) {
+  if (!extra || !extra.trim()) return base;
+  const e = extra.trim();
+  if (e.startsWith("?")) return base + (base.includes("?") ? e.replace("?", "&") : e);
+  if (e.startsWith("&")) return base + e;
+  return base + (base.includes("?") ? `&${e}` : `?${e}`);
 }
 
-export async function getJobCounts(terms: string[]) {
-  const results = await Promise.all(
-    terms.map(async (t) => ({
-      term: t,
-      count: await getJobCountFor(t),
-    }))
-  );
-  return results.sort((a, b) => b.count - a.count);
+export async function getCountForQuery(extraQuery: string): Promise<number> {
+  const url = joinUrl(baseURL, extraQuery);
+  const data = await get<AfResponse>(url);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const total = typeof (data as any)?.total === "number" ? (data as any).total : (data as any)?.total?.value;
+  return Number(total ?? 0);
 }
