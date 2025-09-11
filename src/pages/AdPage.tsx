@@ -133,7 +133,7 @@ export default function AdPage() {
           {!!job.must_have && (
             <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
                 <h3>Krav</h3>
-                {!!job.must_have?.work_experiences?.length && (
+                {(job.must_have?.work_experiences?.length > 0) && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Arbetslivserfarenhet</h4>
                     <ul>
@@ -145,7 +145,7 @@ export default function AdPage() {
                     </ul>
                   </DigiLayoutContainer>
                 )}
-                {!!job.must_have?.skills?.length && (
+                {(job.must_have?.skills?.length > 0) && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Kompetenser</h4>
                     <ul>
@@ -157,7 +157,7 @@ export default function AdPage() {
                     </ul>
                   </DigiLayoutContainer>
                 )}
-                {!!job.must_have?.languages?.length && (
+                {(job.must_have?.languages?.length > 0) && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Språk</h4>
                     <ul>
@@ -169,7 +169,7 @@ export default function AdPage() {
                     </ul>
                   </DigiLayoutContainer>
                 )}
-                {!!job.must_have?.education?.length && (
+                {(job.must_have?.education?.length > 0) && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Utbildning</h4>
                     <ul>
