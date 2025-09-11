@@ -1,3 +1,12 @@
+/*
+type WorkExperience = {
+    concept_id: string;
+    label: string;
+    legacy_ams_taxonomy_id: string;    
+};
+WorkExperience[];
+*/
+
 export type Job = {
     id: string;
     headline: string;
@@ -29,7 +38,9 @@ export type Job = {
         information: string;
         reference: string; 
         email: string;
+        via_af: boolean;
         url: string;
+        other: string;
     }
     experience_required: boolean;
     access_to_own_car: boolean;

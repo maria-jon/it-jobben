@@ -3,9 +3,23 @@ import { useEffect, useState } from "react";
 import { getJobById } from "../services/jobService";
 import type { Job } from "../models/Job";
 
-
 import { DigiInfoCard, DigiLayoutBlock, DigiLayoutContainer, DigiLink, DigiLinkExternal, DigiTypography, DigiTypographyMeta, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
-import { InfoCardBorderPosition, InfoCardHeadingLevel, InfoCardType, InfoCardVariation, LayoutBlockVariation, LinkVariation, TypographyMetaVariation, TypographyTimeVariation } from "@digi/arbetsformedlingen";
+import { InfoCardBorderPosition, InfoCardHeadingLevel, InfoCardType, InfoCardVariation, LayoutBlockVariation, TypographyMetaVariation, TypographyTimeVariation } from "@digi/arbetsformedlingen";
+
+/** Helper for conditional rendering
+ * Takes value and only renders element if value exists
+*/
+type InfoProps = { value?: string | null };
+
+const Info = ({ value }: InfoProps) => {
+  const v = value?.trim();
+  if (!v) return null; 
+  return (
+    <div>
+      {v}
+    </div>
+  );
+};
 
 export default function AdPage() {
   const navigate = useNavigate();
@@ -37,6 +51,51 @@ export default function AdPage() {
 
   localStorage.setItem("job", JSON.stringify(job));
 
+  type ApplicationDetails = Job["application_details"];
+  type AppItem = {
+    key: keyof ApplicationDetails;
+    label: string;
+    description?: string;
+    value: string;
+    href?: string; 
+  };
+
+  /** Helper for application details
+   * create conditional rendering to show correct information depending on application_details
+  */
+  const decideApplicationDetails = (a?: ApplicationDetails): AppItem | undefined => {
+    if (!a) return;
+
+    const clean = (v?: string | null) => (typeof v === "string" ? v.trim() : "");
+    const order: (keyof ApplicationDetails)[] = ["url", "email", "information", "other", "reference", "via_af"];
+
+    for (const key of order) {
+      const val = a[key];
+
+      if (typeof val === "string") {
+        const v = clean(val);
+        if (!v) continue;
+
+        if (key === "email") return {key, label: `${v}`, description: "Maila din ansökan till", value: v, href: `mailto:${v}` };
+        if (key === "url")   return { key, label: "Ansök här", description: "Ansök via arbetsgivarens webbplats", value: v, href: v };
+
+        const label = 
+        key === "information" ? "Ansökningsinfo" :
+        key === "other"       ? "Övrigt" :
+        /* reference */         "Referens";
+
+        return { key, label, value: v };
+      }
+
+      if (key === "via_af" && val === true) {
+        return { key, label: "Via Arbetsförmedlingen", description: "Ansök via AF-portalen", value: "Ansök via AF-portalen" };
+      }
+    }
+
+    return;
+  }
+  const item = decideApplicationDetails(job.application_details);
+
   return (
     <>
       <DigiLink
@@ -63,27 +122,67 @@ export default function AdPage() {
           </header>
           <DigiLayoutContainer afVerticalPadding afNoGutter>
             <p>
-              {job.working_hours_type.label}
-              <br />
-              {job.duration.label}
-              <br />
-              {job.employment_type.label}
+              <Info value={job?.working_hours_type?.label} />
+              <Info value={job?.duration?.label} />
+              <Info value={job?.employment_type?.label} />
             </p>
           </DigiLayoutContainer>
-          {/* TODO 
-          * create conditional rendering to only show this if there are must haves
-          * render work_experiences
+          {/** TODO 
+           * fix conditional rendering to only show this if there are must haves
           */}
-          <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
-              <h3>Kvalifikationer</h3>
-              <p>
-                {job.must_have.skills}
-                {job.must_have.languages}
-                {/*job.must_have.work_experiences*/}
-                {job.must_have.education}
-                {job.must_have.education_level}
-              </p>
-          </DigiLayoutBlock>
+          {!!job.must_have && (
+            <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
+                <h3>Krav</h3>
+                {!!job.must_have?.work_experiences?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Arbetslivserfarenhet</h4>
+                    <ul>
+                      {job.must_have.work_experiences.map((we) => (
+                        <li key={we.concept_id || we.label}>
+                          {we.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+                {!!job.must_have?.skills?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Kompetenser</h4>
+                    <ul>
+                      {job.must_have.skills.map((s) => (
+                        <li key={s.concept_id || s.label}>
+                          {s.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+                {!!job.must_have?.languages?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Språk</h4>
+                    <ul>
+                      {job.must_have.languages.map((l) => (
+                        <li key={l.concept_id || l.label}>
+                          {l.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+                {!!job.must_have?.education?.length && (
+                  <DigiLayoutContainer afVerticalPadding afNoGutter>
+                    <h4>Utbildning</h4>
+                    <ul>
+                      {job.must_have.education.map((e) => (
+                        <li key={e.concept_id || e.label}>
+                          {e.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </DigiLayoutContainer>
+                )}
+            </DigiLayoutBlock>
+          )}
           <DigiLayoutContainer afVerticalPadding afNoGutter>
             <h3>Om jobbet</h3>
             <p>
@@ -94,51 +193,43 @@ export default function AdPage() {
             <h3>Om anställningen</h3>
             <h4>Lön</h4>
             <p>
-              {job.salary_description}
-              <br />
-              {job.salary_type.label}
+              <Info value={job?.salary_description} />
+              <Info value={job?.salary_type?.label} />
             </p>
+
             <h4>Anställningsvillkor</h4>
             <p>
-              {job.employment_type.label}
-              <br /> 
-              {job.duration.label}
-              <br /> 
-              {job.working_hours_type.label}
+              <Info value={job?.working_hours_type?.label} />
+              <Info value={job?.duration?.label} />
+              <Info value={job?.employment_type?.label} />
             </p>
+
             <h4>Arbetsplats</h4>
             <p>
               <span>Arbetplatsen ligger i </span>
-              <strong>{job.workplace_address.municipality}</strong>, 
-              {job.workplace_address.region}
+              <Info value={job?.workplace_address.municipality} />
+              <Info value={job?.workplace_address.region} />
             </p>
           </DigiLayoutContainer>
           <DigiLayoutContainer afVerticalPadding afNoGutter>
             <h3>Arbetsgivaren</h3>
             <p>
-              {job.employer.workplace}
-              <br />
-              {job.employer.name}
-              <br /> 
+              <Info value={job?.employer.workplace} />
+              <Info value={job.employer.name} />
               <DigiLinkExternal
                 afHref={job.employer.url}
                 afTarget="_blank"
-                afVariation={LinkVariation.SMALL}
               >
                 {job.employer.url}
               </DigiLinkExternal>
             </p>
           </DigiLayoutContainer>
-          {/* TODO 
-          * create conditional rendering to show correct information depending on application_details
-          * (application via email, url, etc)
-          */}
           <DigiInfoCard
             afHeading="Sök jobbet"
             afHeadingLevel={InfoCardHeadingLevel.H2}
             afType={InfoCardType.RELATED}
-            afLinkHref={job.application_details.url}	
-            afLinkText="Sök jobbet"	
+            afLinkHref={item?.href}	
+            afLinkText={item?.label}	
             afVariation={InfoCardVariation.SECONDARY}	
             afBorderPosition={InfoCardBorderPosition.TOP}
           >
@@ -157,6 +248,7 @@ export default function AdPage() {
                   />)
                 </span>
             </p>
+            <p>{item?.description}</p>
           </DigiInfoCard>
         </DigiTypography>
       </DigiLayoutBlock>
