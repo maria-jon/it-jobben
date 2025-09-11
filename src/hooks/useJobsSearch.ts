@@ -10,14 +10,19 @@ export const useJobsSearch = (queryParams?: string) => {
   useEffect(() => {
     let cancelled = false;
 
+    const cleanQuery =
+    queryParams && queryParams.trim().length > 0
+      ? queryParams.replace(/^\?/, "") 
+      : "";
+
     const fetchJobs = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data =
-          queryParams && queryParams.trim().length > 0
-            ? await getJobs(queryParams)
-            : await getJobs();
+      const data =
+        cleanQuery.length > 0
+          ? await getJobs(cleanQuery)
+          : await getJobs();
 
         if (!cancelled) {
           setJobs(data);
