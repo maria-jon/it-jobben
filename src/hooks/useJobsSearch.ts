@@ -19,9 +19,10 @@ export const useJobsSearch = (queryParams?: string) => {
       setError(null);
       try {
         const data = await getJobs(queryParams);
-        if (!cancelled) setJobs(data);
+        if (!cancelled) setJobs(data ?? []);
       } catch (err) {
         if (!cancelled) setError((err as Error).message);
+        setJobs([]); 
       } finally {
         if (!cancelled) setLoading(false);
       }
