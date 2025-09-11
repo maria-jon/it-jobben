@@ -34,7 +34,7 @@ export default function HeroSection() {
 
       <form onSubmit={onSubmit} role="search" aria-label="Job search">
         <DigiFormInputSearch
-          afLabel=""
+          afLabel="Sök jobb"
           afVariation={FormInputSearchVariation.MEDIUM}
           afType={FormInputType.SEARCH}
           afButtonText="Search"
