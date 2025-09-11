@@ -7,7 +7,8 @@ import { get } from "./serviceBase";
 
 export const getJobs = async (queryParams?: string): Promise<Job[]> => {
     try {
-        const url = queryParams ? `${baseURL}${queryParams}` : baseURL;
+        const joinChar = baseURL.includes("?") ? "&" : "?";
+        const url = queryParams ? `${baseURL}${joinChar}${queryParams}` : baseURL;
         const data = await get<AfResponse>(url);
         console.log(data.hits)
         return data.hits;
