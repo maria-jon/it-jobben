@@ -1,40 +1,87 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { DigiFormInputSearch } from "@digi/arbetsformedlingen-react";
 import { JobCard } from "../components/JobCard";
-import type { Job } from "../models/Job";
-import { getJobs } from "../services/jobService";
 import { HandleSorting } from "../components/HandleSorting";
+import { useJobsSearch } from "../hooks/useJobsSearch";
+import type { Job } from "../models/Job";
 
 export default function SearchPage() {
-  const [jobs, setJobs] = useState<Job[]>(
-    JSON.parse(localStorage.getItem("jobs") || "[]"),
-  );
-  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // URL q parameter
+  const params = new URLSearchParams(location.search);
+  const q = params.get("q") ?? "";
+
+  // Input state localt
+  const [term, setTerm] = useState(q);
+
+  //URL state keep in sync with q
+  const [query, setQuery] = useState<string>(location.search || "");
   useEffect(() => {
-    const getData = async () => {
-      const jobs = await getJobs();
-      setJobs(jobs);
-    };
+    setQuery(location.search || "");
+    // sync input when URL change (back/forward)
+    setTerm(q);
+  }, [location.search, q]);
 
-    if (jobs.length > 0) return;
+  const { jobs, loading, error } = useJobsSearch(query);
 
-    getData();
-  });
+  // Search submit -> navigate with q i URL
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const next = term.trim();
+    if (!next) return;
+    const usp = new URLSearchParams(location.search);
+    usp.set("q", next);
+    // Remove page; to reset to first page on new search
+    navigate(
+      { pathname: "/search", search: `?${usp.toString()}` },
+      { replace: true }
+    );
+  };
 
-  const handleSorting = async (queryParams?: string) => {
-    try {
-      const data = await getJobs(queryParams);
-      setJobs(data);
-    } catch {
-      throw new Error ("Kunde inte hämta sorterade jobb")
-    }
-  }
+  // Sorting change -> navigate with sort in URL
+  const handleSorting = (sortQuery?: string) => {
+    const usp = new URLSearchParams(location.search);
+    const clean = (sortQuery ?? "").replace(/^\?/, "").replace(/^&/, "");
+    const s = new URLSearchParams(clean).get("sort");
+    if (s) usp.set("sort", s);
+    else usp.delete("sort");
+    navigate(
+      { pathname: "/search", search: `?${usp.toString()}` },
+      { replace: true }
+    );
+  };
 
   return (
     <>
       <h1>Sök jobb</h1>
+
+      <form
+        onSubmit={onSubmit}
+        role="search"
+        aria-label="Job search"
+        style={{ marginBottom: 12 }}
+      >
+        <DigiFormInputSearch
+          afLabel=""
+          afButtonText="Sök"
+          value={term}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onChange={(e: any) =>
+            setTerm(e?.target?.value ?? e?.detail?.value ?? "")
+          }
+        />
+      </form>
+
       <HandleSorting onSort={handleSorting} />
 
-      {jobs.map((j) => (
+      {loading && <p>Söker…</p>}
+      {error && <p className="text-red-600">{error}</p>}
+      {!loading && !jobs.length && q && <p>Inga jobb hittades för ”{q}”.</p>}
+
+      {jobs.map((j: Job) => (
         <JobCard key={j.id} job={j} />
       ))}
     </>
