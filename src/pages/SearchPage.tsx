@@ -44,14 +44,18 @@ export default function SearchPage() {
   // Sorting change -> navigate with sort in URL
   const handleSorting = (sortQuery?: string) => {
     const usp = new URLSearchParams(location.search);
-    const clean = (sortQuery ?? "").replace(/^\?/, "").replace(/^&/, "");
-    const s = new URLSearchParams(clean).get("sort");
-    if (s) usp.set("sort", s);
-    else usp.delete("sort");
-    navigate(
-      { pathname: "/search", search: `?${usp.toString()}` },
-      { replace: true }
-    );
+
+    if (sortQuery) {
+      // Clean leading ? or & if any
+      const cleaned = sortQuery.replace(/^\?&?/, "");
+      // Extract value of sort param
+      const value = new URLSearchParams(cleaned).get("sort");
+      if (value) usp.set("sort", value);
+    } else {
+      usp.delete("sort");
+    }
+
+    navigate(`/search?${usp.toString()}`, { replace: true });
   };
 
   return (

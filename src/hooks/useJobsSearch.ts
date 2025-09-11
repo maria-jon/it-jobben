@@ -8,27 +8,35 @@ export const useJobsSearch = (queryParams?: string) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!queryParams) {
-      setJobs([]);
-      return;
-    }
-
     let cancelled = false;
+
     const fetchJobs = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await getJobs(queryParams);
-        if (!cancelled) setJobs(data ?? []);
+        const data =
+          queryParams && queryParams.trim().length > 0
+            ? await getJobs(queryParams)
+            : await getJobs();
+
+        if (!cancelled) {
+          setJobs(data);
+        }
       } catch (err) {
-        if (!cancelled) setError((err as Error).message);
-        setJobs([]); 
+        if (!cancelled) {
+          setError(
+            (err as Error).message || "Något gick fel vid hämtning av jobb."
+          );
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchJobs();
+
     return () => {
       cancelled = true;
     };
