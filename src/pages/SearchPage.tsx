@@ -69,7 +69,7 @@ export default function SearchPage() {
         style={{ marginBottom: 12 }}
       >
         <DigiFormInputSearch
-          afLabel=""
+          afLabel="Sök jobb"
           afButtonText="Sök"
           value={term}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
