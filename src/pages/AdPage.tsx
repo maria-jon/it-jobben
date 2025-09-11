@@ -6,21 +6,6 @@ import type { Job } from "../models/Job";
 import { DigiInfoCard, DigiLayoutBlock, DigiLayoutContainer, DigiLink, DigiLinkExternal, DigiTypography, DigiTypographyMeta, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
 import { InfoCardBorderPosition, InfoCardHeadingLevel, InfoCardType, InfoCardVariation, LayoutBlockVariation, TypographyMetaVariation, TypographyTimeVariation } from "@digi/arbetsformedlingen";
 
-/** Helper for conditional rendering
- * Takes value and only renders element if value exists
-*/
-type InfoProps = { value?: string | null };
-
-const Info = ({ value }: InfoProps) => {
-  const v = value?.trim();
-  if (!v) return null; 
-  return (
-    <div>
-      {v}
-    </div>
-  );
-};
-
 export default function AdPage() {
   const navigate = useNavigate();
 
@@ -28,28 +13,94 @@ export default function AdPage() {
   const { id: adId } = useParams<{ id: string }>();
   const id = adId ? decodeURIComponent(adId).trim() : "";
 
-  const [job, setJob] = useState<Job>(
-    JSON.parse(localStorage.getItem("job") || "[]"),
-  );
-  const [hasFetched, setHasFetched] = useState(false);
-  
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    const getData = async () => {
+    let cancelled = false;
+    if (!id) {
+      setJob(null);
+      setError("Kan inte hitta annons"); 
+      setLoading(false); 
+      return; 
+    };
+
+    setLoading(true);
+    setError(null);
+    setJob(null); // resets job when reloading page
+
+    (async () => {
+      // Show if cached 
       try {
-        const job = await getJobById(id);
-        setJob(job);
-      } catch {
-        throw new Error (`Kan inte hitta annons med id ${id}`)
-      } finally {
-        setHasFetched(true);
+        const cached = localStorage.getItem(`job:${id}`);
+        if (cached && !cancelled) setJob(JSON.parse(cached) as Job);
+      } catch (e) {
+        console.warn("No cache", e);
       }
-    }
-    if(hasFetched) return;
 
-    getData();
-  });
+      // Fetch from API
+      try {
+        const fresh = await getJobById(id);
+        if (!fresh) throw new Error("NOT_FOUND");
+        if (!cancelled) {
+          setError(null);
+          setJob(fresh);
+          localStorage.setItem(`job:${id}`, JSON.stringify(fresh));
+        }
+      } catch {
+        if (!cancelled) {
+          setJob(null);
+          setError(`Kan inte hitta annons med id ${id}`);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
 
-  localStorage.setItem("job", JSON.stringify(job));
+    return () => { cancelled = true; };
+  }, [id]);
+
+  if (loading) return <p>Laddar…</p>;
+  if (error || !job) {
+    return (
+      <>
+        <DigiLink
+          afHref="/"
+          afOverrideLink
+          afAriaLabel="Gå tillbaka"
+          onAfOnClick={() => navigate(-1)}
+        >
+          ← Tillbaka
+        </DigiLink>
+        <DigiLayoutBlock afVariation={LayoutBlockVariation.PRIMARY}>
+          <DigiInfoCard
+            afType={InfoCardType.RELATED}
+            afHeading="Kunde inte visa annonsen"
+            afBorderPosition={InfoCardBorderPosition.LEFT}
+            afVariation={InfoCardVariation.PRIMARY}
+          >
+            <p role="alert">{error}</p>
+          </DigiInfoCard>
+        </DigiLayoutBlock>
+      </>
+    )
+  }
+  if (!job) return null;
+
+  // Arrays for must-haves
+  const we = job?.must_have?.work_experiences ?? [];
+  const skills = job?.must_have?.skills ?? [];
+  const languages = job?.must_have?.languages ?? [];
+  const education = job?.must_have?.education ?? [];
+
+  // Booleans for conditional render
+  const hasWE = Array.isArray(we) && we.length > 0;
+  const hasSkills = Array.isArray(skills) && skills.length > 0;
+  const hasLanguages = Array.isArray(languages) && languages.length > 0;
+  const hasEducation = Array.isArray(education) && education.length > 0;
+
+  const hasAnyMust = hasWE || hasSkills || hasLanguages || hasEducation;
 
   type ApplicationDetails = Job["application_details"];
   type AppItem = {
@@ -91,7 +142,6 @@ export default function AdPage() {
         return { key, label: "Via Arbetsförmedlingen", description: "Ansök via AF-portalen", value: "Ansök via AF-portalen" };
       }
     }
-
     return;
   }
   const item = decideApplicationDetails(job.application_details);
@@ -108,7 +158,7 @@ export default function AdPage() {
       </DigiLink>
       <DigiLayoutBlock afVariation={LayoutBlockVariation.PRIMARY}>
         <DigiTypography>
-          <header>
+          <DigiLayoutContainer afVerticalPadding afNoGutter>
             <h2>{job.headline}</h2>
             <h3>{job.employer.name}</h3>
             <DigiTypographyMeta afVariation={TypographyMetaVariation.PRIMARY}>
@@ -119,37 +169,40 @@ export default function AdPage() {
                 {job.workplace_address.municipality || job.workplace_address.country}
               </p>
             </DigiTypographyMeta>
-          </header>
+          </DigiLayoutContainer>
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <p>
-              <Info value={job?.working_hours_type?.label} />
-              <Info value={job?.duration?.label} />
-              <Info value={job?.employment_type?.label} />
-            </p>
+            {job?.working_hours_type?.label && (
+              <p>{job.working_hours_type.label}</p>
+            )}
+            {job?.duration?.label && (
+              <p>{job.duration.label}</p>
+            )}
+            {job?.employment_type?.label && (
+              <p>{job.employment_type.label}</p>
+            )}
           </DigiLayoutContainer>
           {/** TODO 
            * fix conditional rendering to only show this if there are must haves
           */}
-          {!!job.must_have && (
+          {hasAnyMust && (
             <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
                 <h3>Krav</h3>
-                {(job.must_have?.work_experiences?.length > 0) && (
+                {hasWE ? (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Arbetslivserfarenhet</h4>
                     <ul>
-                      {job.must_have.work_experiences.map((we) => (
-                        <li key={we.concept_id || we.label}>
-                          {we.label}
-                        </li>
+                      {we.map(we => (
+                        <li key={we.concept_id}>{we.label}</li>
                       ))}
                     </ul>
                   </DigiLayoutContainer>
-                )}
-                {(job.must_have?.skills?.length > 0) && (
+                ) : null}
+
+                {hasSkills && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Kompetenser</h4>
                     <ul>
-                      {job.must_have.skills.map((s) => (
+                      {skills.map((s) => (
                         <li key={s.concept_id || s.label}>
                           {s.label}
                         </li>
@@ -157,11 +210,11 @@ export default function AdPage() {
                     </ul>
                   </DigiLayoutContainer>
                 )}
-                {(job.must_have?.languages?.length > 0) && (
+                {hasLanguages && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Språk</h4>
                     <ul>
-                      {job.must_have.languages.map((l) => (
+                      {languages.map((l) => (
                         <li key={l.concept_id || l.label}>
                           {l.label}
                         </li>
@@ -169,11 +222,11 @@ export default function AdPage() {
                     </ul>
                   </DigiLayoutContainer>
                 )}
-                {(job.must_have?.education?.length > 0) && (
+                {hasEducation && (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
                     <h4>Utbildning</h4>
                     <ul>
-                      {job.must_have.education.map((e) => (
+                      {education.map((e) => (
                         <li key={e.concept_id || e.label}>
                           {e.label}
                         </li>
@@ -192,37 +245,50 @@ export default function AdPage() {
           <DigiLayoutContainer afVerticalPadding afNoGutter>
             <h3>Om anställningen</h3>
             <h4>Lön</h4>
-            <p>
-              <Info value={job?.salary_description} />
-              <Info value={job?.salary_type?.label} />
-            </p>
+            {job?.salary_description && (
+              <p>{job?.salary_description}</p>
+            )}
+            {job?.salary_type?.label && (
+              <p>{job?.salary_type.label}</p>
+            )}
 
             <h4>Anställningsvillkor</h4>
-            <p>
-              <Info value={job?.working_hours_type?.label} />
-              <Info value={job?.duration?.label} />
-              <Info value={job?.employment_type?.label} />
-            </p>
+            {job?.working_hours_type?.label && (
+              <p>{job.working_hours_type.label}</p>
+            )}
+            {job?.duration?.label && (
+              <p>{job.duration.label}</p>
+            )}
+            {job?.employment_type?.label && (
+              <p>{job.employment_type.label}</p>
+            )}
 
             <h4>Arbetsplats</h4>
-            <p>
-              <span>Arbetplatsen ligger i </span>
-              <Info value={job?.workplace_address.municipality} />
-              <Info value={job?.workplace_address.region} />
-            </p>
+            {job?.workplace_address?.municipality && (
+              <p>{job.workplace_address.municipality}</p>
+            )}
+            {job?.workplace_address?.region && (
+              <p>{job.workplace_address.region}</p>
+            )}
+            {job?.workplace_address?.country && (
+              <p>{job.workplace_address.country}</p>
+            )}
           </DigiLayoutContainer>
+
           <DigiLayoutContainer afVerticalPadding afNoGutter>
             <h3>Arbetsgivaren</h3>
-            <p>
-              <Info value={job?.employer.workplace} />
-              <Info value={job.employer.name} />
-              <DigiLinkExternal
-                afHref={job.employer.url}
-                afTarget="_blank"
-              >
-                {job.employer.url}
-              </DigiLinkExternal>
-            </p>
+            {job?.employer?.workplace && (
+              <p>{job.employer.workplace}</p>
+            )}
+            {job?.employer?.name && (
+              <p>{job.employer.name}</p>
+            )}
+            <DigiLinkExternal
+              afHref={job.employer.url}
+              afTarget="_blank"
+            >
+              {job.employer.url}
+            </DigiLinkExternal>
           </DigiLayoutContainer>
           <DigiInfoCard
             afHeading="Sök jobbet"
