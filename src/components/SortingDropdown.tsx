@@ -4,7 +4,7 @@ type HandleSortingProps = {
   onSort: (queryParams: string) => void;
 };
 
-export const HandleSorting = ({ onSort }: HandleSortingProps) => {
+export const SortingDropdown = ({ onSort }: HandleSortingProps) => {
 
 const applyDateAsc = import.meta.env.VITE_SORT_APPLYDATE_ASC;
 const pubDateAsc = import.meta.env.VITE_SORT_PUBDATE_ASC;
