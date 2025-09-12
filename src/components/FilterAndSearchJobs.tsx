@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DigiFormInputSearch } from "@digi/arbetsformedlingen-react";
-import { JobCard } from "./JobCard";
-import { HandleSorting } from "./HandleSorting";
+import { SortingDropdown } from "./SortingDropdown";
 import { useJobsSearch } from "../hooks/useJobsSearch";
-import type { Job } from "../models/Job";
 
-export default function SearchView() {
+type FilterProps = {
+  query: string;
+  setQuery: (q: string) => void;
+};
+
+export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -18,12 +21,11 @@ export default function SearchView() {
   const [term, setTerm] = useState(q);
 
   //URL state keep in sync with q
-  const [query, setQuery] = useState<string>(location.search || "");
   useEffect(() => {
     setQuery(location.search || "");
     // sync input when URL change (back/forward)
     setTerm(q);
-  }, [location.search, q]);
+  }, [location.search, q, setQuery]);
 
   const { jobs, loading, error } = useJobsSearch(query);
 
@@ -38,6 +40,7 @@ export default function SearchView() {
       { pathname: "/search", search: `?${usp.toString()}` },
       { replace: true }
     );
+      setQuery(next);
   };
 
   // Sorting change -> navigate with sort in URL
@@ -59,8 +62,6 @@ export default function SearchView() {
 
   return (
     <>
-      <h1>Sök jobb</h1>
-
       <form
         onSubmit={onSubmit}
         role="search"
@@ -78,15 +79,11 @@ export default function SearchView() {
         />
       </form>
 
-      <HandleSorting onSort={handleSorting} />
+      <SortingDropdown onSort={handleSorting} />
 
       {loading && <p>Söker…</p>}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && !jobs.length && q && <p>Inga jobb hittades för ”{q}”.</p>}
-
-      {jobs.map((j: Job) => (
-        <JobCard key={j.id} job={j} />
-      ))}
     </>
   );
 }
