@@ -2,6 +2,7 @@
   display: none !important;
 }
 
+/*
 .sc-digi-header-navigation-item-h .sc-digi-header-navigation-item-s>a:hover+.digi-header-navigation-item-indicator--active {
      --INDICATOR-COLOR: #b902c3;
 }
@@ -13,3 +14,4 @@
 .sc-digi-layout-block-h .digi-layout-block--profile.sc-digi-layout-block {
     --BACKGROUND: #6b0071;
 }
+*/
