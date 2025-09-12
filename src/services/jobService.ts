@@ -19,8 +19,7 @@ function joinUrl(base: string, extra?: string) {
 
 export const getJobs = async (queryParams?: string): Promise<{hits: Job[]; total: number}> => {
     try {
-        const joinChar = baseURL.includes("?") ? "&" : "?";
-        const url = queryParams ? `${baseURL}${joinChar}${queryParams}` : baseURL;
+        const url = joinUrl(baseURL, queryParams);
         const data = await get<AfResponse>(url);
         console.log(data.hits)
         console.log(data.total)
