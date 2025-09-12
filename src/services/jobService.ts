@@ -17,14 +17,20 @@ function joinUrl(base: string, extra?: string) {
   return base + (base.includes("?") ? `&${e}` : `?${e}`);
 }
 
-export const getJobs = async (queryParams?: string): Promise<Job[]> => {
-  try {
-    const url = joinUrl(baseURL, queryParams);
-    const data = await get<AfResponse>(url);
-    return data.hits;
-  } catch {
-    throw new Error("Ojdå, något blev tokitg!");
-  }
+export const getJobs = async (queryParams?: string): Promise<{hits: Job[]; total: number}> => {
+    try {
+        const joinChar = baseURL.includes("?") ? "&" : "?";
+        const url = queryParams ? `${baseURL}${joinChar}${queryParams}` : baseURL;
+        const data = await get<AfResponse>(url);
+        console.log(data.hits)
+        console.log(data.total)
+        return {
+            hits: data.hits, 
+            total: data.total.value,
+        }
+    } catch {
+        throw new Error ("Ojdå, något blev tokigt!")
+    }
 };
 
 export const getJobById = async (id: string) => {
