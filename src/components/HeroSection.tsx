@@ -1,4 +1,8 @@
-import { DigiFormInputSearch, DigiLayoutBlock, DigiTypography } from "@digi/arbetsformedlingen-react";
+import {
+  DigiFormInputSearch,
+  DigiLayoutBlock,
+  DigiTypography,
+} from "@digi/arbetsformedlingen-react";
 import {
   FormInputSearchVariation,
   FormInputType,
@@ -28,10 +32,14 @@ export default function HeroSection() {
       <DigiTypography>
         <h1>Hitta ditt nästa jobb som utvecklare</h1>
         <p>
-          Sök bland hundratals annonser för programmerare och utvecklare i hela
-          Sverige.
+          Välkommen till IT-jobben - en studentbyggd platsbank som samlar
+          aktuella annonser direkt från Arbetsförmedlingens öppna data.
         </p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit…</p>
+        <p>
+          Här kan du enkelt söka, filtrera och sortera bland hundratals jobb
+          inom utveckling och IT. Vår vision är att göra det smidigare för
+          studenter och utvecklare att hitta sitt nästa drömjobb.
+        </p>
 
         <form onSubmit={onSubmit} role="search" aria-label="Job search">
           <DigiFormInputSearch
