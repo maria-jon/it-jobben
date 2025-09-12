@@ -2,10 +2,13 @@ import {
   DigiFormInputSearch,
   DigiLayoutBlock,
   DigiTypography,
+  DigiTypographyHeadingJumbo,
 } from "@digi/arbetsformedlingen-react";
 import {
   FormInputSearchVariation,
   FormInputType,
+  TypographyHeadingJumboLevel,
+  TypographyHeadingJumboVariation,
 } from "@digi/arbetsformedlingen";
 import type { FormEvent } from "react";
 import { useState } from "react";
@@ -30,7 +33,11 @@ export default function HeroSection() {
   return (
     <DigiLayoutBlock afVerticalPadding afMarginTop className="hero">
       <DigiTypography>
-        <h1>Hitta ditt nästa jobb som utvecklare</h1>
+        <DigiTypographyHeadingJumbo
+          afText="Hitta ditt nästa jobb som utvecklare"
+          afLevel={TypographyHeadingJumboLevel.H1}
+          afVariation={TypographyHeadingJumboVariation.PRIMARY}
+        />
         <p>
           Välkommen till IT-jobben - en studentbyggd platsbank som samlar
           aktuella annonser direkt från Arbetsförmedlingens öppna data.

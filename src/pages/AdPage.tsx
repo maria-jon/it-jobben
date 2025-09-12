@@ -165,8 +165,7 @@ export default function AdPage() {
             afText={job.headline}
             afLevel={TypographyHeadingJumboLevel.H1}
             afVariation={TypographyHeadingJumboVariation.PRIMARY}
-          >
-          </DigiTypographyHeadingJumbo>
+          />
             <h2>{job.employer.name}</h2>
             <DigiTypographyMeta afVariation={TypographyMetaVariation.PRIMARY}>
               <p>
