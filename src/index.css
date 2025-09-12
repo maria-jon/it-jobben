@@ -1,3 +1,28 @@
 @import '@digi/arbetsformedlingen/dist/digi-arbetsformedlingen/digi-arbetsformedlingen.css';
 @import '@digi/arbetsformedlingen/dist/digi-arbetsformedlingen/fonts/src/fonts.css';
 @import './style/tokens.css/';
+
+body {
+    background: var(--digi--global--color--profile--white--dark);
+}
+
+#root {
+    background: var(--digi--global--color--profile--white--darkest-2);
+}
+
+a {
+    color: var(--digi--global--color--cta--link--base);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--digi--global--color--cta--hover--base);
+}
+
+a:visited {
+    color: var(--digi--global--color--cta--visited--base);
+}
+
+a:visited:hover {
+    color: #99a1a6;
+}
