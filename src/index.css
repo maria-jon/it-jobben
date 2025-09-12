@@ -4,10 +4,16 @@
 
 body {
     background: var(--digi--global--color--profile--white--dark);
+    margin: 0 auto;
 }
 
 #root {
+    margin: 0 var(--digi--global--spacing--base);
     background: var(--digi--global--color--profile--white--darkest-2);
+}
+
+main {
+    margin: 0 var(--digi--global--spacing--base);
 }
 
 a {
