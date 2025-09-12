@@ -3,6 +3,8 @@ import type { Job } from "../models/Job";
 import { DigiInfoCardMulti, DigiTypography, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
 import { InfoCardMultiHeadingLevel, InfoCardMultiType, TypographyTimeVariation, TypographyVariation } from "@digi/arbetsformedlingen";
 
+import './JobCard.css';
+
 type JobCardProps = {
     job: Job;
 }
