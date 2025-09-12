@@ -60,7 +60,7 @@
     --digi--global--color--cta--visited--base: #B0B6BA;
     --digi--global--color--cta--hover--base: #BA9C3B;
     --digi--global--color--cta--link--base: #F0DB99;
-    --digi--global--color--cta--blue--darker: #0C4631;
+    --digi--global--color--cta--blue--darker: #F0DB99; /*hover btn*/
     --digi--global--color--cta--blue--dark: #A4F5D9;
     --digi--global--color--cta--blue--base: #dafbef;
     --digi--global--color--cta--green--lighter: #DAF6A2;
@@ -104,6 +104,8 @@
     --digi--color--icons--secondary: #40B089;
 
     --digi--global--color--function--info--base: #40B089;
+    
+    --digi--color--background--inverted-5: #0A2333;
     
 }
 
