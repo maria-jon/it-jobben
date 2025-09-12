@@ -1,4 +1,4 @@
-import { DigiFormInputSearch } from "@digi/arbetsformedlingen-react";
+import { DigiFormInputSearch, DigiLayoutBlock, DigiTypography } from "@digi/arbetsformedlingen-react";
 import {
   FormInputSearchVariation,
   FormInputType,
@@ -24,25 +24,27 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="hero">
-      <h1>Hitta ditt nästa jobb som utvecklare</h1>
-      <p>
-        Sök bland hundratals annonser för programmerare och utvecklare i hela
-        Sverige.
-      </p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit…</p>
+    <DigiLayoutBlock afVerticalPadding afMarginTop className="hero">
+      <DigiTypography>
+        <h1>Hitta ditt nästa jobb som utvecklare</h1>
+        <p>
+          Sök bland hundratals annonser för programmerare och utvecklare i hela
+          Sverige.
+        </p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit…</p>
 
-      <form onSubmit={onSubmit} role="search" aria-label="Job search">
-        <DigiFormInputSearch
-          afLabel="Sök jobb"
-          afVariation={FormInputSearchVariation.MEDIUM}
-          afType={FormInputType.SEARCH}
-          afButtonText="Search"
-          value={term}
-          onChange={handleChange}
-        />
-        <input type="hidden" name="q" value={term} />
-      </form>
-    </section>
+        <form onSubmit={onSubmit} role="search" aria-label="Job search">
+          <DigiFormInputSearch
+            afLabel="Sök jobb"
+            afVariation={FormInputSearchVariation.MEDIUM}
+            afType={FormInputType.SEARCH}
+            afButtonText="Sök"
+            value={term}
+            onChange={handleChange}
+          />
+          <input type="hidden" name="q" value={term} />
+        </form>
+      </DigiTypography>
+    </DigiLayoutBlock>
   );
 }
