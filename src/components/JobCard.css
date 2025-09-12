@@ -1,0 +1,7 @@
+p.sc-digi-info-card-multi {
+    margin-bottom: 0;
+}
+
+p.sc-digi-info-card-multi:last-child {
+    margin-bottom: 2rem;
+}
