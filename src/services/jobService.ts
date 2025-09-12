@@ -5,13 +5,17 @@ import type { AfResponse } from "../models/AfResponse";
 import type { Job } from "../models/Job";
 import { get } from "./serviceBase";
 
-export const getJobs = async (queryParams?: string): Promise<Job[]> => {
+export const getJobs = async (queryParams?: string): Promise<{hits: Job[]; total: number}> => {
     try {
         const joinChar = baseURL.includes("?") ? "&" : "?";
         const url = queryParams ? `${baseURL}${joinChar}${queryParams}` : baseURL;
         const data = await get<AfResponse>(url);
         console.log(data.hits)
-        return data.hits;
+        console.log(data.total)
+        return {
+            hits: data.hits, 
+            total: data.total.value,
+        }
     } catch {
         throw new Error ("Ojdå, något blev tokitg!")
         
