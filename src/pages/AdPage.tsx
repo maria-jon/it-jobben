@@ -3,8 +3,28 @@ import { useEffect, useState } from "react";
 import { getJobById } from "../services/jobService";
 import type { Job } from "../models/Job";
 
-import { DigiInfoCard, DigiLayoutBlock, DigiLayoutContainer, DigiLink, DigiLinkExternal, DigiTypography, DigiTypographyHeadingJumbo, DigiTypographyMeta, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
-import { InfoCardBorderPosition, InfoCardHeadingLevel, InfoCardType, InfoCardVariation, LayoutBlockVariation, TypographyHeadingJumboLevel, TypographyHeadingJumboVariation, TypographyMetaVariation, TypographyTimeVariation } from "@digi/arbetsformedlingen";
+import { 
+  DigiInfoCard, 
+  DigiLayoutBlock, 
+  DigiLayoutContainer, 
+  DigiLink, 
+  DigiLinkExternal, 
+  DigiTypography, 
+  DigiTypographyHeadingJumbo, 
+  DigiTypographyMeta, 
+  DigiTypographyTime
+} from "@digi/arbetsformedlingen-react";
+import { 
+  InfoCardBorderPosition, 
+  InfoCardHeadingLevel, 
+  InfoCardType, 
+  InfoCardVariation, 
+  LayoutBlockVariation, 
+  TypographyHeadingJumboLevel, 
+  TypographyHeadingJumboVariation, 
+  TypographyMetaVariation, 
+  TypographyTimeVariation
+} from "@digi/arbetsformedlingen";
 
 import './AdPage.css';
 
@@ -240,15 +260,15 @@ export default function AdPage() {
             </DigiLayoutBlock>
           )}
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h3>Om jobbet</h3>
+            <h2>Om jobbet</h2>
             <p>
               {job.description.text}
             </p>
           </DigiLayoutContainer>
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h3>Om anställningen</h3>
+            <h2>Om anställningen</h2>
             <DigiLayoutContainer afNoGutter>
-              <h4>Lön</h4>
+              <h3>Lön</h3>
               {job?.salary_description && (
                 <p>{job?.salary_description}</p>
               )}
@@ -258,7 +278,7 @@ export default function AdPage() {
             </DigiLayoutContainer>
 
             <DigiLayoutContainer afNoGutter>
-              <h4>Anställningsvillkor</h4>
+              <h3>Anställningsvillkor</h3>
               {job?.working_hours_type?.label && (
                 <p>{job.working_hours_type.label}</p>
               )}
@@ -271,7 +291,7 @@ export default function AdPage() {
             </DigiLayoutContainer>
 
             <DigiLayoutContainer afNoGutter>
-              <h4>Arbetsplats</h4>
+              <h3>Arbetsplats</h3>
               {job?.workplace_address?.municipality && (
                 <p>{job.workplace_address.municipality}</p>
               )}
@@ -285,7 +305,7 @@ export default function AdPage() {
           </DigiLayoutContainer>
 
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h3>Arbetsgivaren</h3>
+            <h2>Arbetsgivaren</h2>
             {job?.employer?.workplace && (
               <p>{job.employer.workplace}</p>
             )}

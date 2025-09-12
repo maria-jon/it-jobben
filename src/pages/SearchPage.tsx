@@ -4,8 +4,15 @@ import type { Job } from "../models/Job";
 import { useJobsSearch } from "../hooks/useJobsSearch";
 import { useState } from "react";
 import { FilterAndSearchJobs } from "../components/FilterAndSearchJobs";
-import { DigiLayoutBlock, DigiTypography, DigiTypographyHeadingJumbo } from "@digi/arbetsformedlingen-react";
-import { TypographyHeadingJumboLevel, TypographyHeadingJumboVariation } from "@digi/arbetsformedlingen";
+import { 
+  DigiLayoutBlock, 
+  DigiTypography, 
+  DigiTypographyHeadingJumbo 
+} from "@digi/arbetsformedlingen-react";
+import { 
+  TypographyHeadingJumboLevel, 
+  TypographyHeadingJumboVariation 
+} from "@digi/arbetsformedlingen";
 
 export const SearchPage = () => {
 

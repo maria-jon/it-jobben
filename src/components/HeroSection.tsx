@@ -2,13 +2,13 @@ import {
   DigiFormInputSearch,
   DigiLayoutBlock,
   DigiTypography,
-  DigiTypographyHeadingJumbo,
+  DigiTypographyHeadingJumbo
 } from "@digi/arbetsformedlingen-react";
 import {
   FormInputSearchVariation,
   FormInputType,
   TypographyHeadingJumboLevel,
-  TypographyHeadingJumboVariation,
+  TypographyHeadingJumboVariation
 } from "@digi/arbetsformedlingen";
 import type { FormEvent } from "react";
 import { useState } from "react";
