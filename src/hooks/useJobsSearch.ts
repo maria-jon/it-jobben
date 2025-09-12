@@ -2,30 +2,32 @@ import { useEffect, useState } from "react";
 import { getJobs } from "../services/jobService";
 import type { Job } from "../models/Job";
 
-export const useJobsSearch = (queryParams?: string) => {
+export const useJobsSearch = (queryParams?: string, page: number = 1, limit = 20) => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [total, setTotal] = useState<number>(0);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    const cleanQuery =
-    queryParams && queryParams.trim().length > 0
-      ? queryParams.replace(/^\?/, "") 
-      : "";
+    const offset = (page - 1) * limit
+
+    const cleanQuery = queryParams?.trim().replace(/^\?/, "") ?? "";
+
+    const finalQuery = cleanQuery
+      ? `${cleanQuery}&offset=${offset}&limit=${limit}`
+      : `offset=${offset}&limit=${limit}`;
 
     const fetchJobs = async () => {
       setLoading(true);
       setError(null);
       try {
-      const data =
-        cleanQuery.length > 0
-          ? await getJobs(cleanQuery)
-          : await getJobs();
-
+      const data = await getJobs(finalQuery);
         if (!cancelled) {
-          setJobs(data);
+          setJobs(data.hits);   
+          setTotal(data.total); 
         }
       } catch (err) {
         if (!cancelled) {
@@ -45,7 +47,7 @@ export const useJobsSearch = (queryParams?: string) => {
     return () => {
       cancelled = true;
     };
-  }, [queryParams]);
+  }, [queryParams, page, limit]);
 
-  return { jobs, loading, error } as const;
+  return { jobs, loading, error, total } as const;
 };
