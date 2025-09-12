@@ -5,8 +5,13 @@ import { JobCard } from "../components/JobCard";
 import { HandleSorting } from "../components/HandleSorting";
 import { useJobsSearch } from "../hooks/useJobsSearch";
 import type { Job } from "../models/Job";
+import { Pagination } from "../components/Pagination";
 
 export default function SearchPage() {
+  const [page, setPage] = useState<number>(1);
+
+  const limit = 20;
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -25,7 +30,7 @@ export default function SearchPage() {
     setTerm(q);
   }, [location.search, q]);
 
-  const { jobs, loading, error } = useJobsSearch(query);
+  const { jobs, loading, error, total } = useJobsSearch(query, page, limit);
 
   // Search submit -> navigate with q i URL
   const onSubmit = (e: React.FormEvent) => {
@@ -88,6 +93,9 @@ export default function SearchPage() {
       {jobs.map((j: Job) => (
         <JobCard key={j.id} job={j} />
       ))}
+
+      <Pagination total={total} limit={limit} onPageChange={setPage} page={page} />
+      
     </>
   );
 }
