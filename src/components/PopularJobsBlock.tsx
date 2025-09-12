@@ -1,5 +1,15 @@
+import { 
+  DigiLayoutBlock, 
+  DigiLayoutColumns, 
+  DigiLinkInternal, 
+  DigiTypography,
+} from "@digi/arbetsformedlingen-react";
+import {
+  LayoutColumnsElement,
+  LayoutColumnsVariation,
+} from "@digi/arbetsformedlingen";
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getCountForQuery } from "../services/popularJobsService";
 
 type Row = { id: string; label: string; count: number };
@@ -44,38 +54,27 @@ export default function PopularJobsBlock() {
   if (err) return <section role="alert">{err}</section>;
 
   return (
-    <section
-      aria-labelledby="popular-dev-heading"
-      style={{ marginTop: "2rem" }}
-    >
-      <h2 id="popular-dev-heading">Flest annonser just nu </h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
-          gap: ".75rem",
-          marginTop: ".5rem",
-        }}
-      >
-        {rows.map(({ id, label, count }) => (
-          <Link
-            key={id}
-            to={`/search?occupation-group=${encodeURIComponent(
-              id
-            )}&sort=pubdate-desc`}
-            aria-label={`Visa ${count} annonser: ${label}`}
-            style={{
-              display: "block",
-              padding: ".5rem .75rem",
-              border: "1px solid #ccc",
-              borderRadius: ".5rem",
-              textDecoration: "none",
-            }}
-          >
-            {label} {count ? `(${count})` : ""}
-          </Link>
-        ))}
-      </div>
-    </section>
+    <DigiLayoutBlock afVerticalPadding afMarginTop afMarginBottom aria-labelledby="popular-dev-heading">
+      <DigiTypography>
+        <h2 id="popular-dev-heading">Flest annonser just nu </h2>
+        <DigiLayoutColumns
+          afElement={LayoutColumnsElement.DIV}
+          afVariation={LayoutColumnsVariation.TWO}
+        >
+          {rows.map(({ id, label, count }) => (
+            <DigiLinkInternal
+              key={id}
+              afHref={`/search?occupation-group=${encodeURIComponent(
+                id
+              )}&sort=pubdate-desc`}
+              hideVisitedColor
+              afAriaLabel={`Visa ${count} annonser: ${label}`}
+            >
+              {label} {count ? `(${count})` : ""}
+            </DigiLinkInternal>
+          ))}
+        </DigiLayoutColumns>
+      </DigiTypography>
+    </DigiLayoutBlock>
   );
 }
