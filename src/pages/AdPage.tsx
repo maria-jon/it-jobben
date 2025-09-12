@@ -187,9 +187,6 @@ export default function AdPage() {
               <p>{job.employment_type.label}</p>
             )}
           </DigiLayoutContainer>
-          {/** TODO 
-           * fix conditional rendering to only show this if there are must haves
-          */}
           {hasAnyMust && (
             <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
                 <h3>Krav</h3>
