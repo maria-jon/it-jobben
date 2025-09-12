@@ -208,7 +208,7 @@ export default function AdPage() {
             )}
           </DigiLayoutContainer>
           {hasAnyMust && (
-            <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
+            <DigiLayoutBlock afVerticalPadding afVariation={LayoutBlockVariation.SECONDARY}>
                 <h3>Krav</h3>
                 {hasWE ? (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
