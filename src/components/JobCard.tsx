@@ -1,8 +1,18 @@
 import type { Job } from "../models/Job";
 
-import { DigiButton, DigiIconHeartSolid, DigiInfoCardMulti, DigiTypography, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
-import { ButtonSize, ButtonVariation, InfoCardMultiHeadingLevel, InfoCardMultiType, TypographyTimeVariation, TypographyVariation } from "@digi/arbetsformedlingen";
-import { useState } from "react";
+import { 
+    DigiInfoCardMulti, 
+    DigiTypography, 
+    DigiTypographyTime, 
+} from "@digi/arbetsformedlingen-react";
+import { 
+    InfoCardMultiHeadingLevel, 
+    InfoCardMultiType, 
+    TypographyTimeVariation, 
+    TypographyVariation, 
+} from "@digi/arbetsformedlingen";
+
+import './JobCard.css';
 
 type JobCardProps = {
     job: Job;

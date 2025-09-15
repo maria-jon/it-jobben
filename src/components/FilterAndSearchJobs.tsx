@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DigiFormInputSearch } from "@digi/arbetsformedlingen-react";
+import { DigiFormInputSearch, DigiLayoutContainer } from "@digi/arbetsformedlingen-react";
 import { SortingDropdown } from "./SortingDropdown";
 import { useJobsSearch } from "../hooks/useJobsSearch";
 
@@ -61,7 +61,7 @@ export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
   };
 
   return (
-    <>
+    <DigiLayoutContainer afNoGutter afMarginTop> 
       <form
         onSubmit={onSubmit}
         role="search"
@@ -69,7 +69,7 @@ export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
         style={{ marginBottom: 12 }}
       >
         <DigiFormInputSearch
-          afLabel="Sök jobb"
+          afLabel="Sök på ett eller flera ord"
           afButtonText="Sök"
           value={term}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,6 +84,6 @@ export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
       {loading && <p>Söker…</p>}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && !jobs.length && q && <p>Inga jobb hittades för ”{q}”.</p>}
-    </>
+    </DigiLayoutContainer>
   );
 }

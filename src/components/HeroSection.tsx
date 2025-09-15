@@ -1,11 +1,15 @@
 import {
   DigiFormInputSearch,
   DigiLayoutBlock,
+  DigiLayoutContainer,
   DigiTypography,
+  DigiTypographyHeadingJumbo
 } from "@digi/arbetsformedlingen-react";
 import {
   FormInputSearchVariation,
   FormInputType,
+  TypographyHeadingJumboLevel,
+  TypographyHeadingJumboVariation
 } from "@digi/arbetsformedlingen";
 import type { FormEvent } from "react";
 import { useState } from "react";
@@ -30,16 +34,22 @@ export default function HeroSection() {
   return (
     <DigiLayoutBlock afVerticalPadding afMarginTop className="hero">
       <DigiTypography>
-        <h1>Hitta ditt nästa jobb som utvecklare</h1>
-        <p>
-          Välkommen till IT-jobben - en studentbyggd platsbank som samlar
-          aktuella annonser direkt från Arbetsförmedlingens öppna data.
-        </p>
-        <p>
-          Här kan du enkelt söka, filtrera och sortera bland hundratals jobb
-          inom utveckling och IT. Vår vision är att göra det smidigare för
-          studenter och utvecklare att hitta sitt nästa drömjobb.
-        </p>
+        <DigiTypographyHeadingJumbo
+          afText="Hitta ditt nästa jobb som utvecklare"
+          afLevel={TypographyHeadingJumboLevel.H1}
+          afVariation={TypographyHeadingJumboVariation.PRIMARY}
+        />
+        <DigiLayoutContainer afVerticalPadding afNoGutter>
+          <p>
+            Välkommen till IT-jobben - en studentbyggd platsbank som samlar
+            aktuella annonser direkt från Arbetsförmedlingens öppna data.
+          </p>
+          <p>
+            Här kan du enkelt söka, filtrera och sortera bland hundratals jobb
+            inom utveckling och IT. Vår vision är att göra det smidigare för
+            studenter och utvecklare att hitta sitt nästa drömjobb.
+          </p>
+        </DigiLayoutContainer>
 
         <form onSubmit={onSubmit} role="search" aria-label="Job search">
           <DigiFormInputSearch

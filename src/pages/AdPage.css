@@ -1,0 +1,11 @@
+p.sc-digi-layout-block.sc-digi-layout-container {
+    margin-bottom: 0.5rem;
+}
+
+p.sc-digi-layout-block:last-child {
+    margin-bottom: 1rem;
+}
+
+p.sc-digi-typography-meta:last-child {
+    margin-bottom: 0;
+}

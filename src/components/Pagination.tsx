@@ -1,5 +1,7 @@
 import { DigiNavigationPagination } from "@digi/arbetsformedlingen-react"
 
+import './Pagination.css';
+
 type PaginationProps = {
     total: number;
     limit: number;
