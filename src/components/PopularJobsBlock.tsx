@@ -1,7 +1,7 @@
-import { 
-  DigiLayoutBlock, 
-  DigiLayoutColumns, 
-  DigiLinkInternal, 
+import {
+  DigiLayoutBlock,
+  DigiLayoutColumns,
+  DigiLinkInternal,
   DigiTypography,
 } from "@digi/arbetsformedlingen-react";
 import {
@@ -14,15 +14,18 @@ import { getCountForQuery } from "../services/popularJobsService";
 
 type Row = { id: string; label: string; count: number };
 
-const GROUPS: { id: string; label: string }[] = [
-  { id: "2512", label: "Mjukvaru- & systemutvecklare m.fl." },
-  { id: "2514", label: "Systemtestare & testledare" },
-  { id: "2516", label: "IT-säkerhetsspecialister" },
-  { id: "3515", label: "Webbmaster / webbadministratörer" },
+// Search keywords to show, with corresponding query strings
+const KEYWORDS: { id: string; label: string; query: string }[] = [
+  { id: "java", label: "Java", query: "java AND -javascript" },
+  { id: "dotnet", label: ".NET", query: '".net" OR c#' },
+  { id: "react", label: "React", query: 'react OR "react.js" OR reactjs' },
+  { id: "frontend", label: "Frontend", query: 'frontend OR "front end"' },
 ];
 
-// A block to show popular job categories for developers with counts
-// Uses occupation-group query param to filter on job ads
+//  Optional: filter within a specific occupation group
+//  See https://jobsearch.api.jobtechdev.se/documentation/parameters/#occupation-group
+const OCCUPATION_GROUP: string | null = null;
+
 export default function PopularJobsBlock() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,48 +34,70 @@ export default function PopularJobsBlock() {
   useEffect(() => {
     (async () => {
       try {
-        const withCounts = await Promise.all(
-          GROUPS.map(async (g) => ({
-            id: g.id,
-            label: g.label,
-            count: await getCountForQuery(
-              `occupation-group=${encodeURIComponent(g.id)}&limit=0`
-            ),
-          }))
+        const withCounts: Row[] = await Promise.all(
+          KEYWORDS.map(async (k) => {
+            // Build query with optional occupation group filter
+            const extra =
+              `q=${encodeURIComponent(k.query)}` +
+              (OCCUPATION_GROUP
+                ? `&occupation-group=${encodeURIComponent(OCCUPATION_GROUP)}`
+                : "") +
+              `&limit=0`;
+            // Fetch count for this query
+            const count = await getCountForQuery(extra);
+            return { id: k.id, label: k.label, count };
+          })
         );
+        // Sort by count descending
         withCounts.sort((a, b) => b.count - a.count);
         setRows(withCounts);
       } catch {
-        setErr("Kunde inte hämta Data/IT-grupper just nu.");
+        setErr("Kunde inte hämta antal jobb just nu.");
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
+  // Loading and error states
   if (loading) return <section aria-busy="true">Laddar kategorier…</section>;
   if (err) return <section role="alert">{err}</section>;
 
   return (
-    <DigiLayoutBlock afVerticalPadding afMarginTop afMarginBottom aria-labelledby="popular-dev-heading">
+    <DigiLayoutBlock
+      afVerticalPadding
+      afMarginTop
+      afMarginBottom
+      aria-labelledby="popular-dev-heading"
+    >
       <DigiTypography>
-        <h2 id="popular-dev-heading">Flest annonser just nu </h2>
+        <h2 id="popular-dev-heading">Flest annonser just nu</h2>
+
         <DigiLayoutColumns
           afElement={LayoutColumnsElement.DIV}
           afVariation={LayoutColumnsVariation.TWO}
         >
-          {rows.map(({ id, label, count }) => (
-            <DigiLinkInternal
-              key={id}
-              afHref={`/search?occupation-group=${encodeURIComponent(
-                id
-              )}&sort=pubdate-desc`}
-              hideVisitedColor
-              afAriaLabel={`Visa ${count} annonser: ${label}`}
-            >
-              {label} {count ? `(${count})` : ""}
-            </DigiLinkInternal>
-          ))}
+          {rows.map(({ id, label, count }) => {
+            const kw = KEYWORDS.find((k) => k.id === id)!;
+            // Link to search page with this keyword and optional occupation group filter
+            const href =
+              `/search?q=${encodeURIComponent(kw.query)}` +
+              (OCCUPATION_GROUP
+                ? `&occupation-group=${encodeURIComponent(OCCUPATION_GROUP)}`
+                : "") +
+              `&sort=pubdate-desc`;
+
+            return (
+              <DigiLinkInternal
+                key={id}
+                afHref={href}
+                hideVisitedColor
+                afAriaLabel={`Visa ${count} annonser: ${label}`}
+              >
+                {label} {count ? `(${count})` : ""}
+              </DigiLinkInternal>
+            );
+          })}
         </DigiLayoutColumns>
       </DigiTypography>
     </DigiLayoutBlock>
