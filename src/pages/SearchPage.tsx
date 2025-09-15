@@ -20,7 +20,7 @@ export const SearchPage = () => {
   const [query, setQuery] = useState<string>("");
   const limit = 20;
 
-  const { jobs, total } = useJobsSearch(query, page, limit);
+  const { jobs, total, loading, error } = useJobsSearch(query, page, limit);
   
   return ( 
   <>
@@ -38,6 +38,12 @@ export const SearchPage = () => {
     {jobs.map((j: Job) => (
       <JobCard key={j.id} job={j} />
     ))}
+
+    {loading && <p>Söker…</p>}
+    {error && <p className="text-red-600">{error}</p>}
+    {!loading && !jobs.length && query && (
+      <p>Inga jobb för den sökningen hittades, testa att söka på något annat.</p>
+    )}
 
     <Pagination total={total} limit={limit} onPageChange={setPage} page={page} />
   </>

@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DigiFormInputSearch, DigiLayoutContainer } from "@digi/arbetsformedlingen-react";
 import { SortingDropdown } from "./SortingDropdown";
-import { useJobsSearch } from "../hooks/useJobsSearch";
 
 type FilterProps = {
   query: string;
   setQuery: (q: string) => void;
 };
 
-export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
+export const FilterAndSearchJobs = ({ setQuery}: FilterProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -26,8 +25,6 @@ export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
     // sync input when URL change (back/forward)
     setTerm(q);
   }, [location.search, q, setQuery]);
-
-  const { jobs, loading, error } = useJobsSearch(query);
 
   // Search submit -> navigate with q i URL
   const onSubmit = (e: React.FormEvent) => {
@@ -80,10 +77,6 @@ export const FilterAndSearchJobs = ({query, setQuery}: FilterProps) => {
       </form>
 
       <SortingDropdown onSort={handleSorting} />
-
-      {loading && <p>Söker…</p>}
-      {error && <p className="text-red-600">{error}</p>}
-      {!loading && !jobs.length && q && <p>Inga jobb hittades för ”{q}”.</p>}
     </DigiLayoutContainer>
   );
 }
