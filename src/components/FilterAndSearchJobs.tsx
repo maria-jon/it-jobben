@@ -80,8 +80,17 @@ export const FilterAndSearchJobs = ({ setQuery }: FilterProps) => {
         />
       </form>
 
-      <SortingDropdown onSort={handleSorting} />
-      <LocationDropdown />
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <SortingDropdown onSort={handleSorting} />
+        <LocationDropdown />
+      </div>
     </DigiLayoutContainer>
   );
 };
