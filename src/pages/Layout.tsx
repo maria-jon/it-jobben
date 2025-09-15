@@ -17,7 +17,12 @@ export const Layout = () => {
         setSavedJobs(newSavedJobs);                
         localStorage.setItem("savedJobs", JSON.stringify(newSavedJobs)); 
         }};
-    console.log(savedJobs)
+
+    const removeSavedJob = (job: Job) => {
+        const newSavedJobs = (savedJobs.filter(j => j.id !== job.id));
+        setSavedJobs(newSavedJobs);
+        localStorage.setItem("savedJobs", JSON.stringify(newSavedJobs));
+    }
 
     return (
         <>
@@ -25,7 +30,7 @@ export const Layout = () => {
             <Header />
         </header>
         <main>
-            <SavedJobsContext.Provider value={{savedJobs, addJob}}>
+            <SavedJobsContext.Provider value={{savedJobs, addJob, removeSavedJob}}>
             <Outlet />
             </SavedJobsContext.Provider>
         </main>
