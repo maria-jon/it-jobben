@@ -46,12 +46,16 @@ export const LocationDropdown = () => {
         );
         const data = await get<any>(url);
 
+        console.debug("facets.raw:", data?.facets);
+
         // Try to find facets in different possible structures
         const buckets =
           data?.facets?.municipality ??
           data?.facets?.municipalities ??
           data?.aggregations?.municipality ??
           [];
+
+        console.debug("facets.municipality buckets:", buckets);
 
         const rows: Kommun[] = buckets.map((b: any) => ({
           kod: String(b.id ?? b.value ?? b.code ?? ""),
@@ -102,19 +106,31 @@ export const LocationDropdown = () => {
   const meny = [
     { id: 0, title: "Alla orter", onClick: rensa },
     { id: 1, title: "Distans (remote)", onClick: sättDistans },
+    {
+      id: 2,
+      title: "Sök ort …",
+      onClick: () => {
+        const input = window
+          .prompt("Skriv ort/kommun (t.ex. Lund, Stockholm):")
+          ?.trim();
+        if (!input) return;
+        const needle = input.toLocaleLowerCase("sv-SE");
+        const match = kommuner.find((k) =>
+          k.namn.toLocaleLowerCase("sv-SE").includes(needle)
+        );
+        if (match) sättKommun(match.kod);
+        else window.alert(`Hittade ingen kommun som matchar: ${input}`);
+      },
+    },
+
+    // Add municipalities from facet
     ...synligaKommuner.map((k, i) => ({
       id: 100 + i,
       title: `${k.namn} (${k.antal})`,
       onClick: () => sättKommun(k.kod),
     })),
     ...(kommuner.length > 20 && !visaAlla
-      ? [
-          {
-            id: 9999,
-            title: "Visa fler…",
-            onClick: () => setVisaAlla(true),
-          },
-        ]
+      ? [{ id: 9999, title: "Visa fler…", onClick: () => setVisaAlla(true) }]
       : []),
   ];
 
