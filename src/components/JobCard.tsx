@@ -1,11 +1,15 @@
 import type { Job } from "../models/Job";
 
 import { 
+    DigiButton,
+    DigiIconHeartSolid,
     DigiInfoCardMulti, 
     DigiTypography, 
     DigiTypographyTime, 
 } from "@digi/arbetsformedlingen-react";
 import { 
+    ButtonSize,
+    ButtonVariation,
     InfoCardMultiHeadingLevel, 
     InfoCardMultiType, 
     TypographyTimeVariation, 
@@ -13,19 +17,19 @@ import {
 } from "@digi/arbetsformedlingen";
 
 import './JobCard.css';
+import { useContext } from "react";
+import { SavedJobsContext } from "../context/SavedJobsContext";
 
 type JobCardProps = {
     job: Job;
 }
 
 export const JobCard = ({ job }: JobCardProps) => {
-
-    // ta bort sen
-    const [test, setTest] = useState(1);
+    
+    const { addJob } = useContext(SavedJobsContext);
 
     return(
         <>
-        <h1>{test}</h1>
             <DigiInfoCardMulti
                 afHeading={job.headline}
                 afHeadingLevel={InfoCardMultiHeadingLevel.H2}
@@ -41,12 +45,12 @@ export const JobCard = ({ job }: JobCardProps) => {
                 style={
                     {
                     position: "absolute",
-                    top: "45px",
+                    top: "80px",
                     right: "80px",
                     } as React.CSSProperties
                 }
                 afFullWidth={false}
-                onAfOnClick={() => setTest(test + 1)}>
+                onAfOnClick={() => addJob(job)}>
                 Spara som favorit
             <DigiIconHeartSolid slot="icon-secondary" />
             </DigiButton>
