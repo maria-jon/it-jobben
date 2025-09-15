@@ -13,6 +13,23 @@ export const LocationDropdown = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Mapping of municipality names to their codes
+  const MUNICIPALITY_CODE: Record<string, string> = {
+    Stockholm: "0180",
+    Göteborg: "1480",
+    Malmö: "1280",
+    Uppsala: "0380",
+    Västerås: "1980",
+  };
+
+  // Function to set municipality filter in URL
+  const setMunicipality = (city: keyof typeof MUNICIPALITY_CODE) => {
+    const usp = new URLSearchParams(location.search);
+    usp.delete("remote");
+    usp.set("municipality", MUNICIPALITY_CODE[city]);
+    navigate(`/search?${usp.toString()}`, { replace: true });
+  };
+
   // Define menu items with corresponding URL updates
   const menuItems: MenuItem[] = [
     {
@@ -45,26 +62,8 @@ export const LocationDropdown = () => {
         navigate(`/search?${usp.toString()}`, { replace: true });
       },
     },
-    {
-      id: 3,
-      title: "Stockholm",
-      onClick: () => {
-        const usp = new URLSearchParams(location.search);
-        usp.delete("remote");
-        usp.set("municipality", "Stockholm");
-        navigate(`/search?${usp.toString()}`, { replace: true });
-      },
-    },
-    {
-      id: 4,
-      title: "Göteborg",
-      onClick: () => {
-        const usp = new URLSearchParams(location.search);
-        usp.delete("remote");
-        usp.set("municipality", "Göteborg");
-        navigate(`/search?${usp.toString()}`, { replace: true });
-      },
-    },
+    { id: 3, title: "Stockholm", onClick: () => setMunicipality("Stockholm") },
+    { id: 4, title: "Göteborg", onClick: () => setMunicipality("Göteborg") },
   ];
 
   // Render the context menu with location options
