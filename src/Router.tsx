@@ -4,6 +4,7 @@ import AdPage from "./pages/AdPage";
 import StartPage from "./pages/StartPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { Layout } from "./pages/Layout";
+import { SavedJobsPage } from "./pages/SavedJobsPage";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
       { 
         path: "/ad/:id", 
         element: <AdPage /> 
+      },
+      { 
+        path: "/savedJobs", 
+        element: <SavedJobsPage /> 
       },
     ]
   }
