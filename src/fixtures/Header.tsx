@@ -24,6 +24,9 @@ export const Header = () => {
                     <DigiHeaderNavigationItem afCurrentPage={location.pathname.startsWith("/search")}>
                         <a href="/search">Alla jobb</a>
                     </DigiHeaderNavigationItem>
+                    <DigiHeaderNavigationItem afCurrentPage={location.pathname.startsWith("/savedJobs")}>
+                        <a href="/savedJobs">Dina sparade jobb</a>
+                    </DigiHeaderNavigationItem>
                 </DigiHeaderNavigation>
             </div>
         </DigiHeader>
