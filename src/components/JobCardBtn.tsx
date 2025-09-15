@@ -10,14 +10,21 @@ type JobCardBtnProps = {
 }
 
 export const JobCardBtn = ({job, action}: JobCardBtnProps) => {
-    const { addJob, removeSavedJob } = useContext(SavedJobsContext);
+    const { savedJobs, addJob, removeSavedJob } = useContext(SavedJobsContext);
+
+    const isSaved = savedJobs.some(j => j.id === job.id); 
 
     const handleClick = () => {
-        if (action === "save") addJob(job);
+        if (action === "save")
+            if (isSaved) {
+                removeSavedJob(job)
+            } else {
+                addJob(job)
+            };
         if (action === "remove") removeSavedJob(job);
     }
 
-    const text = action === "save" ? "Spara som favorit" : "Ta bort";
+    const text = action === "save" ? (isSaved ? "Tillagd i din lista" : "Spara som favorit") : "Ta bort";
     const Icon = action === "save" ? DigiIconHeartSolid : DigiIconTrash;
 
     return (
@@ -29,7 +36,7 @@ export const JobCardBtn = ({job, action}: JobCardBtnProps) => {
             {
             position: "absolute",
             top: "80px",
-            right: "80px",
+            right: "5%",
             } as React.CSSProperties
         }
         afFullWidth={false}
