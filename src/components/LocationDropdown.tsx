@@ -1,6 +1,10 @@
 import { DigiContextMenu } from "@digi/arbetsformedlingen-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const LocationDropdown = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const menuItems = [
     { id: 0, title: "Alla orter" },
     { id: 1, title: "Distans (remote)" },
@@ -11,7 +15,9 @@ export const LocationDropdown = () => {
     <DigiContextMenu
       afTitle="Välj ort"
       afMenuItems={menuItems}
-      onAfChangeItem={() => {}}
+      onAfChangeItem={() => {
+        console.log("clicked item", location, navigate);
+      }}
     ></DigiContextMenu>
   );
 };
