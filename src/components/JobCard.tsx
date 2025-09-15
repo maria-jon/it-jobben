@@ -1,15 +1,11 @@
 import type { Job } from "../models/Job";
 
 import { 
-    DigiButton,
-    DigiIconHeartSolid,
     DigiInfoCardMulti, 
     DigiTypography, 
     DigiTypographyTime, 
 } from "@digi/arbetsformedlingen-react";
 import { 
-    ButtonSize,
-    ButtonVariation,
     InfoCardMultiHeadingLevel, 
     InfoCardMultiType, 
     TypographyTimeVariation, 
@@ -17,16 +13,14 @@ import {
 } from "@digi/arbetsformedlingen";
 
 import './JobCard.css';
-import { useContext } from "react";
-import { SavedJobsContext } from "../context/SavedJobsContext";
+import { JobCardBtn } from "./JobCardBtn";
 
 type JobCardProps = {
     job: Job;
+    buttonAction: "save" | "remove";
 }
 
-export const JobCard = ({ job }: JobCardProps) => {
-    
-    const { addJob } = useContext(SavedJobsContext);
+export const JobCard = ({ job, buttonAction }: JobCardProps) => {
 
     return(
         <>
@@ -39,21 +33,7 @@ export const JobCard = ({ job }: JobCardProps) => {
                     {position: "relative",} as React.CSSProperties}       
             >
 
-            <DigiButton
-                afSize={ButtonSize.MEDIUM}
-                afVariation={ButtonVariation.PRIMARY}
-                style={
-                    {
-                    position: "absolute",
-                    top: "80px",
-                    right: "80px",
-                    } as React.CSSProperties
-                }
-                afFullWidth={false}
-                onAfOnClick={() => addJob(job)}>
-                Spara som favorit
-            <DigiIconHeartSolid slot="icon-secondary" />
-            </DigiButton>
+            <JobCardBtn job={job} action={buttonAction} />
 
             <DigiTypography
                     afVariation={TypographyVariation.SMALL}  
