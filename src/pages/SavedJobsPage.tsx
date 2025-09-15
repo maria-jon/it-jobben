@@ -12,7 +12,7 @@ export const SavedJobsPage = () => {
 return (
     <>
         {savedJobs.map((job: Job) => (
-            <JobCard key={job.id} job={job} />
+            <JobCard key={job.id} job={job} buttonAction={"remove"}/>
         ))}
     </>
 )
