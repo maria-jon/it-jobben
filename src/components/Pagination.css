@@ -1,0 +1,30 @@
+.digi-navigation-pagination {
+    margin: 1rem 0 2rem 0;
+}
+
+digi-button.digi-navigation-pagination__button {
+    /* Primary / active button 384752*/
+    --digi--button--color--background--primary--default: #40B089;
+    --digi--button--color--text--primary--default: #0A2333;
+    --digi--button--color--background--primary--hover: #0A2333;
+    --digi--button--color--text--primary--hover: #f3f4f4;
+
+    /* Secondary / unactive buttons */
+    --digi--button--color--background--secondary--default: #0A2333;
+    --digi--button--color--text--secondary--default: #40B089;
+    --digi--button--color--background--secondary--hover: #40B089;
+    --digi--button--color--text--secondary--hover: #0A2333;
+
+    /* Border colors for buttons */
+    --digi--button--color--border--primary--default:#0A2333;
+    --digi--button--color--border--primary--hover:#40B089;
+    --digi--button--color--border--secondary--default:#0A2333;
+    --digi--button--color--border--secondary--hover:#40B089;
+
+    --digi--button--border-width--primary--default: 0.1rem;
+    --digi--button--border-width--primary--hover: 0.1rem;
+
+    /* Icons */
+    --digi--button--color--icon--secondary--default:#40B089;
+    --digi--button--color--icon--secondary--hover:#0A2333;
+}

@@ -4,6 +4,15 @@ import type { Job } from "../models/Job";
 import { useJobsSearch } from "../hooks/useJobsSearch";
 import { useState } from "react";
 import { FilterAndSearchJobs } from "../components/FilterAndSearchJobs";
+import { 
+  DigiLayoutBlock, 
+  DigiTypography, 
+  DigiTypographyHeadingJumbo 
+} from "@digi/arbetsformedlingen-react";
+import { 
+  TypographyHeadingJumboLevel, 
+  TypographyHeadingJumboVariation 
+} from "@digi/arbetsformedlingen";
 
 export const SearchPage = () => {
 
@@ -13,10 +22,18 @@ export const SearchPage = () => {
 
   const { jobs, total } = useJobsSearch(query, page, limit);
   
-  return (
-    <>
-    <h1>Sök jobb</h1>
-    <FilterAndSearchJobs query={query} setQuery={setQuery}/>
+  return ( 
+  <>
+    <DigiLayoutBlock afMarginTop afMarginBottom afVerticalPadding>
+      <DigiTypography>
+        <DigiTypographyHeadingJumbo
+          afText="Sök jobb"
+          afLevel={TypographyHeadingJumboLevel.H1}
+          afVariation={TypographyHeadingJumboVariation.PRIMARY}
+        />
+        <FilterAndSearchJobs query={query} setQuery={setQuery}/>
+      </DigiTypography>
+    </DigiLayoutBlock>
 
     {jobs.map((j: Job) => (
       <JobCard key={j.id} job={j} />

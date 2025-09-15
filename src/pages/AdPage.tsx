@@ -3,8 +3,30 @@ import { useEffect, useState } from "react";
 import { getJobById } from "../services/jobService";
 import type { Job } from "../models/Job";
 
-import { DigiInfoCard, DigiLayoutBlock, DigiLayoutContainer, DigiLink, DigiLinkExternal, DigiTypography, DigiTypographyMeta, DigiTypographyTime } from "@digi/arbetsformedlingen-react";
-import { InfoCardBorderPosition, InfoCardHeadingLevel, InfoCardType, InfoCardVariation, LayoutBlockVariation, TypographyMetaVariation, TypographyTimeVariation } from "@digi/arbetsformedlingen";
+import { 
+  DigiInfoCard, 
+  DigiLayoutBlock, 
+  DigiLayoutContainer, 
+  DigiLink, 
+  DigiLinkExternal, 
+  DigiTypography, 
+  DigiTypographyHeadingJumbo, 
+  DigiTypographyMeta, 
+  DigiTypographyTime
+} from "@digi/arbetsformedlingen-react";
+import { 
+  InfoCardBorderPosition, 
+  InfoCardHeadingLevel, 
+  InfoCardType, 
+  InfoCardVariation, 
+  LayoutBlockVariation, 
+  TypographyHeadingJumboLevel, 
+  TypographyHeadingJumboVariation, 
+  TypographyMetaVariation, 
+  TypographyTimeVariation
+} from "@digi/arbetsformedlingen";
+
+import './AdPage.css';
 
 export default function AdPage() {
   const navigate = useNavigate();
@@ -159,8 +181,12 @@ export default function AdPage() {
       <DigiLayoutBlock afVariation={LayoutBlockVariation.PRIMARY}>
         <DigiTypography>
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h2>{job.headline}</h2>
-            <h3>{job.employer.name}</h3>
+          <DigiTypographyHeadingJumbo
+            afText={job.headline}
+            afLevel={TypographyHeadingJumboLevel.H1}
+            afVariation={TypographyHeadingJumboVariation.PRIMARY}
+          />
+            <h2>{job.employer.name}</h2>
             <DigiTypographyMeta afVariation={TypographyMetaVariation.PRIMARY}>
               <p>
               {job.occupation.label}
@@ -181,11 +207,8 @@ export default function AdPage() {
               <p>{job.employment_type.label}</p>
             )}
           </DigiLayoutContainer>
-          {/** TODO 
-           * fix conditional rendering to only show this if there are must haves
-          */}
           {hasAnyMust && (
-            <DigiLayoutBlock afVariation={LayoutBlockVariation.SECONDARY}>
+            <DigiLayoutBlock afVerticalPadding afVariation={LayoutBlockVariation.SECONDARY}>
                 <h3>Krav</h3>
                 {hasWE ? (
                   <DigiLayoutContainer afVerticalPadding afNoGutter>
@@ -237,46 +260,52 @@ export default function AdPage() {
             </DigiLayoutBlock>
           )}
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h3>Om jobbet</h3>
+            <h2>Om jobbet</h2>
             <p>
               {job.description.text}
             </p>
           </DigiLayoutContainer>
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h3>Om anställningen</h3>
-            <h4>Lön</h4>
-            {job?.salary_description && (
-              <p>{job?.salary_description}</p>
-            )}
-            {job?.salary_type?.label && (
-              <p>{job?.salary_type.label}</p>
-            )}
+            <h2>Om anställningen</h2>
+            <DigiLayoutContainer afNoGutter>
+              <h3>Lön</h3>
+              {job?.salary_description && (
+                <p>{job?.salary_description}</p>
+              )}
+              {job?.salary_type?.label && (
+                <p>{job?.salary_type.label}</p>
+              )}
+            </DigiLayoutContainer>
 
-            <h4>Anställningsvillkor</h4>
-            {job?.working_hours_type?.label && (
-              <p>{job.working_hours_type.label}</p>
-            )}
-            {job?.duration?.label && (
-              <p>{job.duration.label}</p>
-            )}
-            {job?.employment_type?.label && (
-              <p>{job.employment_type.label}</p>
-            )}
+            <DigiLayoutContainer afNoGutter>
+              <h3>Anställningsvillkor</h3>
+              {job?.working_hours_type?.label && (
+                <p>{job.working_hours_type.label}</p>
+              )}
+              {job?.duration?.label && (
+                <p>{job.duration.label}</p>
+              )}
+              {job?.employment_type?.label && (
+                <p>{job.employment_type.label}</p>
+              )}
+            </DigiLayoutContainer>
 
-            <h4>Arbetsplats</h4>
-            {job?.workplace_address?.municipality && (
-              <p>{job.workplace_address.municipality}</p>
-            )}
-            {job?.workplace_address?.region && (
-              <p>{job.workplace_address.region}</p>
-            )}
-            {job?.workplace_address?.country && (
-              <p>{job.workplace_address.country}</p>
-            )}
+            <DigiLayoutContainer afNoGutter>
+              <h3>Arbetsplats</h3>
+              {job?.workplace_address?.municipality && (
+                <p>{job.workplace_address.municipality}</p>
+              )}
+              {job?.workplace_address?.region && (
+                <p>{job.workplace_address.region}</p>
+              )}
+              {job?.workplace_address?.country && (
+                <p>{job.workplace_address.country}</p>
+              )}
+            </DigiLayoutContainer>
           </DigiLayoutContainer>
 
           <DigiLayoutContainer afVerticalPadding afNoGutter>
-            <h3>Arbetsgivaren</h3>
+            <h2>Arbetsgivaren</h2>
             {job?.employer?.workplace && (
               <p>{job.employer.workplace}</p>
             )}
@@ -290,32 +319,35 @@ export default function AdPage() {
               {job.employer.url}
             </DigiLinkExternal>
           </DigiLayoutContainer>
-          <DigiInfoCard
-            afHeading="Sök jobbet"
-            afHeadingLevel={InfoCardHeadingLevel.H2}
-            afType={InfoCardType.RELATED}
-            afLinkHref={item?.href}	
-            afLinkText={item?.label}	
-            afVariation={InfoCardVariation.SECONDARY}	
-            afBorderPosition={InfoCardBorderPosition.TOP}
-          >
-            <p>
-              <span>Ansök senast: </span>
-                <DigiTypographyTime
-                  afVariation={TypographyTimeVariation.DISTANCE}
-                  afLocale="sv-SE"
-                  afDateTime={job.application_deadline}
-                />
-                <span> (
+
+          <DigiLayoutContainer afVerticalPadding afNoGutter>
+            <DigiInfoCard
+              afHeading="Sök jobbet"
+              afHeadingLevel={InfoCardHeadingLevel.H2}
+              afType={InfoCardType.RELATED}
+              afLinkHref={item?.href}	
+              afLinkText={item?.label}	
+              afVariation={InfoCardVariation.SECONDARY}	
+              afBorderPosition={InfoCardBorderPosition.TOP}
+            >
+              <p>
+                <span>Ansök senast: </span>
                   <DigiTypographyTime
-                    afVariation={TypographyTimeVariation.PRETTY}
+                    afVariation={TypographyTimeVariation.DISTANCE}
                     afLocale="sv-SE"
                     afDateTime={job.application_deadline}
-                  />)
-                </span>
-            </p>
-            <p>{item?.description}</p>
-          </DigiInfoCard>
+                  />
+                  <span> (
+                    <DigiTypographyTime
+                      afVariation={TypographyTimeVariation.PRETTY}
+                      afLocale="sv-SE"
+                      afDateTime={job.application_deadline}
+                    />)
+                  </span>
+              </p>
+              <p>{item?.description}</p>
+            </DigiInfoCard>
+          </DigiLayoutContainer>
         </DigiTypography>
       </DigiLayoutBlock>
     </>
