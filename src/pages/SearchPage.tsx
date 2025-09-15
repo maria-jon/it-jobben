@@ -36,7 +36,7 @@ export const SearchPage = () => {
     </DigiLayoutBlock>
 
     {jobs.map((j: Job) => (
-      <JobCard key={j.id} job={j} />
+      <JobCard key={j.id} job={j} buttonAction="save"/>
     ))}
 
     {loading && <p>Söker…</p>}

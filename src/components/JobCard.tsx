@@ -13,22 +13,30 @@ import {
 } from "@digi/arbetsformedlingen";
 
 import './JobCard.css';
+import { JobCardBtn } from "./JobCardBtn";
 
 type JobCardProps = {
     job: Job;
+    buttonAction: "save" | "remove";
 }
 
-export const JobCard = ({ job }: JobCardProps) => {
+export const JobCard = ({ job, buttonAction }: JobCardProps) => {
+
     return(
         <>
             <DigiInfoCardMulti
                 afHeading={job.headline}
                 afHeadingLevel={InfoCardMultiHeadingLevel.H2}
                 afType={InfoCardMultiType.ENTRY}
-                afLinkHref={`/ad/${job.id}`}        
+                afLinkHref={`/ad/${job.id}`}
+                style={
+                    {position: "relative",} as React.CSSProperties}       
             >
-                <DigiTypography
-                    afVariation={TypographyVariation.SMALL}
+
+            <JobCardBtn job={job} action={buttonAction} />
+
+            <DigiTypography
+                    afVariation={TypographyVariation.SMALL}  
                 >
                     <h3>{job.employer.name}</h3>
                     <p>{job.occupation.label}</p>
