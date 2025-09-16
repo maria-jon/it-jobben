@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DigiFormInputSearch, DigiLayoutContainer } from "@digi/arbetsformedlingen-react";
+import {
+  DigiFormInputSearch,
+  DigiLayoutContainer,
+} from "@digi/arbetsformedlingen-react";
 import { SortingDropdown } from "./SortingDropdown";
+import { LocationDropdown } from "./LocationDropdown";
 
 type FilterProps = {
   query: string;
   setQuery: (q: string) => void;
 };
 
-export const FilterAndSearchJobs = ({ setQuery}: FilterProps) => {
+export const FilterAndSearchJobs = ({ setQuery }: FilterProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -37,7 +41,7 @@ export const FilterAndSearchJobs = ({ setQuery}: FilterProps) => {
       { pathname: "/search", search: `?${usp.toString()}` },
       { replace: true }
     );
-      setQuery(next);
+    setQuery(next);
   };
 
   // Sorting change -> navigate with sort in URL
@@ -58,7 +62,7 @@ export const FilterAndSearchJobs = ({ setQuery}: FilterProps) => {
   };
 
   return (
-    <DigiLayoutContainer afNoGutter afMarginTop> 
+    <DigiLayoutContainer afNoGutter afMarginTop>
       <form
         onSubmit={onSubmit}
         role="search"
@@ -76,7 +80,17 @@ export const FilterAndSearchJobs = ({ setQuery}: FilterProps) => {
         />
       </form>
 
-      <SortingDropdown onSort={handleSorting} />
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <SortingDropdown onSort={handleSorting} />
+        <LocationDropdown />
+      </div>
     </DigiLayoutContainer>
   );
-}
+};
