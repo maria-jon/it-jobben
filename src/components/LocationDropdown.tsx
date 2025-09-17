@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
 
 type Municipality = { code: string; name: string; count: number };
 
-const TEXT = {
-  label: "Ort",
-  placeholder: "Välj ort eller distans",
-  all: "Alla orter",
-  remote: "Distans (remote)",
+type AFListItem = {
+  value: string;
+  label: string;
+  selected?: boolean;
+  lang?: string;
+  dir?: "ltr" | "rtl";
 };
 
 function joinUrl(base: string, extra?: string) {
@@ -35,7 +36,6 @@ export const LocationDropdown = () => {
       setLoading(true);
       try {
         const params = new URLSearchParams(location.search);
-        // don’t facet on itself; reset paging
         params.delete("municipality");
         params.delete("offset");
 
@@ -84,35 +84,38 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const options = [
-    { value: "", label: "Alla orter" },
-    { value: "remote", label: "Distans (remote)" },
-    ...municipalities.map((m) => ({
+  const items: AFListItem[] = [
+    { value: "", label: "Alla orter", selected: false, lang: "sv" },
+    { value: "remote", label: "Distans (remote)", selected: false, lang: "sv" },
+    ...municipalities.map<AFListItem>((m) => ({
       value: m.code,
       label: `${m.name} (${m.count})`,
+      selected: false,
       lang: "sv",
     })),
   ];
 
-  const selected = (() => {
-    const usp = new URLSearchParams(location.search);
-    const muni = usp.get("municipality");
-    const remote = usp.get("remote");
-    if (remote === "true") return "remote";
-    return muni ?? "";
-  })();
+  // Selected must also be IListItem[] (even single select)
+  const usp = new URLSearchParams(location.search);
+  const selectedValue =
+    usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
+  const selectedItems: AFListItem[] = items.filter(
+    (i) => i.value === selectedValue
+  );
 
   return (
     <DigiFormSelectFilter
-      afOptions={options}
-      afValue={selected}
-      afIsLoading={loading}
-      onAfOnChange={(e: CustomEvent) => {
-        const val = (e as any).detail.value;
-        if (val === "remote") updateUrl(undefined, true);
-        else if (val) updateUrl(val);
-        else updateUrl();
-      }}
+      {...({
+        afItems: items,
+        afValue: selectedItems,
+        afIsLoading: loading,
+        onAfSelect: (e: any) => {
+          const val = e?.detail?.value as string | undefined;
+          if (val === "remote") updateUrl(undefined, true);
+          else if (val) updateUrl(val);
+          else updateUrl();
+        },
+      } as any)}
     />
   );
 };
