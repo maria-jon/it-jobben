@@ -9,6 +9,7 @@ type Municipality = { code: string; name: string; count: number };
 type AFListItem = {
   value: string;
   label: string;
+  text?: string;
   selected?: boolean;
   lang?: string;
   dir?: "ltr" | "rtl";
@@ -90,27 +91,34 @@ export const LocationDropdown = () => {
     ...municipalities.map<AFListItem>((m) => ({
       value: m.code,
       label: `${m.name} (${m.count})`,
+      text: `${m.name} (${m.count})`,
       selected: false,
       lang: "sv",
     })),
   ];
 
-  // Selected must also be IListItem[] (even single select)
   const usp = new URLSearchParams(location.search);
   const selectedValue =
     usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
-  const selectedItems: AFListItem[] = items.filter(
-    (i) => i.value === selectedValue
-  );
 
   return (
     <DigiFormSelectFilter
       {...({
+        afLabel: "Ort",
         afItems: items,
-        afValue: selectedItems,
+        afValue: selectedValue,
         afIsLoading: loading,
         onAfSelect: (e: any) => {
           const val = e?.detail?.value as string | undefined;
+          if (val === "remote") updateUrl(undefined, true);
+          else if (val) updateUrl(val);
+          else updateUrl();
+        },
+        items,
+        value: items.filter((i) => i.value === selectedValue),
+        isLoading: loading,
+        onValueChange: (vals: AFListItem[]) => {
+          const val = vals?.[0]?.value as string | undefined;
           if (val === "remote") updateUrl(undefined, true);
           else if (val) updateUrl(val);
           else updateUrl();
