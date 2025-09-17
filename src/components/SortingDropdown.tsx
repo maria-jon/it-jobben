@@ -10,6 +10,7 @@ const applyDateAsc = import.meta.env.VITE_SORT_APPLYDATE_ASC;
 const pubDateAsc = import.meta.env.VITE_SORT_PUBDATE_ASC;
 const pubDateDesc  = import.meta.env.VITE_SORT_PUBDATE_DESC;
 
+
 const menuItems = [
     { id: 0, title: "Ansökningsdatum", onClick: () => onSort(applyDateAsc)},
     { id: 1, title: "Publiceringsdatum (äldst först)", onClick: () => onSort(pubDateAsc)},

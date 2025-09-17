@@ -1,19 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
 
 type Municipality = { code: string; name: string; count: number };
-type AFListItem = { value: string; text: string; label?: string };
+
+type AFListItem = {
+  value: string;
+  label: string;
+  text?: string;
+  selected?: boolean;
+  lang?: string;
+  dir?: "ltr" | "rtl";
+};
 
 function joinUrl(base: string, extra?: string) {
   if (!extra || !extra.trim()) return base;
   const e = extra.trim();
   if (e.startsWith("?"))
     return base + (base.includes("?") ? e.replace("?", "&") : e);
-  if (e.startsWith("&"))
-    return base + (base.includes("?") ? e : `?${e.slice(1)}`);
+  if (e.startsWith("&")) return base + e;
   return base + (base.includes("?") ? `&${e}` : `?${e}`);
 }
 
@@ -45,19 +52,16 @@ export const LocationDropdown = () => {
           data?.aggregations?.municipality ??
           [];
 
-        const rows: Municipality[] = buckets.map(
-          (b: any): Municipality => ({
-            code: String(b.id ?? b.value ?? b.code ?? ""),
-            name: String(b.label ?? b.name ?? b.title ?? b.id ?? ""),
-            count: Number(b.count ?? b.doc_count ?? 0),
-          })
-        );
+        const rows: Municipality[] = buckets.map((b: any) => ({
+          code: String(b.id ?? b.value ?? b.code ?? ""),
+          name: String(b.label ?? b.name ?? b.title ?? b.id ?? ""),
+          count: Number(b.count ?? b.doc_count ?? 0),
+        }));
 
-        rows.sort((a: Municipality, b: Municipality) => b.count - a.count);
-
+        rows.sort((a, b) => b.count - a.count);
         setMunicipalities(rows);
-      } catch (e) {
-        console.error("Failed to fetch municipality facets:", e);
+      } catch (err) {
+        console.error("Failed to fetch municipality facets:", err);
         setMunicipalities([]);
       } finally {
         setLoading(false);
@@ -81,18 +85,17 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const items: AFListItem[] = useMemo(
-    () => [
-      { value: "", text: "Alla orter", label: "Alla orter" },
-      { value: "remote", text: "Distans (remote)", label: "Distans (remote)" },
-      ...municipalities.map<AFListItem>((m) => ({
-        value: m.code,
-        text: `${m.name} (${m.count})`,
-        label: `${m.name} (${m.count})`,
-      })),
-    ],
-    [municipalities]
-  );
+  const items: AFListItem[] = [
+    { value: "", label: "Alla orter", selected: false, lang: "sv" },
+    { value: "remote", label: "Distans (remote)", selected: false, lang: "sv" },
+    ...municipalities.map<AFListItem>((m) => ({
+      value: m.code,
+      label: `${m.name} (${m.count})`,
+      text: `${m.name} (${m.count})`,
+      selected: false,
+      lang: "sv",
+    })),
+  ];
 
   const usp = new URLSearchParams(location.search);
   const selectedValue =
@@ -107,6 +110,15 @@ export const LocationDropdown = () => {
         afIsLoading: loading,
         onAfSelect: (e: any) => {
           const val = e?.detail?.value as string | undefined;
+          if (val === "remote") updateUrl(undefined, true);
+          else if (val) updateUrl(val);
+          else updateUrl();
+        },
+        items,
+        value: items.filter((i) => i.value === selectedValue),
+        isLoading: loading,
+        onValueChange: (vals: AFListItem[]) => {
+          const val = vals?.[0]?.value as string | undefined;
           if (val === "remote") updateUrl(undefined, true);
           else if (val) updateUrl(val);
           else updateUrl();
