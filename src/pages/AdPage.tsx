@@ -92,6 +92,7 @@ export default function AdPage() {
           afOverrideLink
           afAriaLabel="Gå tillbaka"
           onAfOnClick={() => navigate(-1)}
+          hideVisitedColor
         >
           ← Tillbaka
         </DigiLink>
@@ -175,6 +176,7 @@ export default function AdPage() {
         afOverrideLink={true}
         afAriaLabel="Gå tillbaka"
         onAfOnClick={() => navigate(-1)}
+        hideVisitedColor
       >	 
         ← Tillbaka
       </DigiLink>
