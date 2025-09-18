@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
+import {
+  DigiFormSelectFilter,
+  type IListItem,
+} from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
 
 type Municipality = { code: string; name: string; count: number };
@@ -23,7 +26,6 @@ export const LocationDropdown = () => {
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loading, setLoading] = useState(true);
 
-  
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -61,18 +63,16 @@ export const LocationDropdown = () => {
     })();
   }, [location.search, baseURL]);
 
-  
   const usp = new URLSearchParams(location.search);
-  const selected =
+  const selectedValue =
     usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
-  const value: string[] = selected ? [selected] : [];
 
-  
-  const items = useMemo(
+  // Build items in AF format (text + value)
+  const items: IListItem[] = useMemo(
     () => [
       { value: "", text: "Alla orter" },
       { value: "remote", text: "Distans (remote)" },
-      ...municipalities.map((m) => ({
+      ...municipalities.map<IListItem>((m) => ({
         value: m.code,
         text: `${m.name} (${m.count})`,
       })),
@@ -80,6 +80,10 @@ export const LocationDropdown = () => {
     [municipalities]
   );
 
+  // DigiFormSelectFilter expects value as IListItem[]
+  const selectedItems: IListItem[] = selectedValue
+    ? items.filter((i) => i.value === selectedValue)
+    : [];
 
   const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
@@ -100,18 +104,11 @@ export const LocationDropdown = () => {
   return (
     <DigiFormSelectFilter
       label="Efter plats"
-      afLabel="Efter plats"
       items={items}
-      value={value} 
+      value={selectedItems}
       isLoading={loading}
-      onAfSelect={(e: any) => {
-        const val = e?.detail?.value as string | undefined;
-        if (val === "remote") updateUrl(undefined, true);
-        else if (val) updateUrl(val);
-        else updateUrl();
-      }}
-      onValueChange={(vals: string[]) => {
-        const val = vals?.[0];
+      onValueChange={(vals: IListItem[]) => {
+        const val = vals?.[0]?.value;
         if (val === "remote") updateUrl(undefined, true);
         else if (val) updateUrl(val);
         else updateUrl();
