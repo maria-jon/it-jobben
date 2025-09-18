@@ -1,20 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
+import "./LocationDropdown.css";
 
+//Server-provider facet shape for a municipality
 type Municipality = { code: string; name: string; count: number };
 
-type AFListItem = {
-  value: string;
-  label: string;
-  text?: string;
-  selected?: boolean;
-  lang?: string;
-  dir?: "ltr" | "rtl";
-};
-
+//Helper: append query params to base url
 function joinUrl(base: string, extra?: string) {
   if (!extra || !extra.trim()) return base;
   const e = extra.trim();
@@ -24,6 +17,15 @@ function joinUrl(base: string, extra?: string) {
   return base + (base.includes("?") ? `&${e}` : `?${e}`);
 }
 
+//Fallback cities if facets are empty
+const FALLBACK_TOP5 = [
+  { code: "0180", name: "Stockholm" },
+  { code: "1480", name: "Göteborg" },
+  { code: "1280", name: "Malmö" },
+  { code: "0380", name: "Uppsala" },
+  { code: "1980", name: "Västerås" },
+];
+
 export const LocationDropdown = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,7 +33,10 @@ export const LocationDropdown = () => {
 
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
+  //Fetch facets when URL changes
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -39,7 +44,6 @@ export const LocationDropdown = () => {
         const params = new URLSearchParams(location.search);
         params.delete("municipality");
         params.delete("offset");
-
         const url = joinUrl(
           baseURL,
           `${params.toString()}&limit=0&facets=municipality`
@@ -58,10 +62,11 @@ export const LocationDropdown = () => {
           count: Number(b.count ?? b.doc_count ?? 0),
         }));
 
+        //Most results first
         rows.sort((a, b) => b.count - a.count);
         setMunicipalities(rows);
-      } catch (err) {
-        console.error("Failed to fetch municipality facets:", err);
+      } catch {
+        //Safe fallback
         setMunicipalities([]);
       } finally {
         setLoading(false);
@@ -69,6 +74,29 @@ export const LocationDropdown = () => {
     })();
   }, [location.search, baseURL]);
 
+  //Read current selection from URL
+  const usp = new URLSearchParams(location.search);
+  const selectedValue =
+    usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
+
+  //Choose top 5 cities
+  const top5 =
+    municipalities.length > 0
+      ? municipalities.slice(0, 5)
+      : FALLBACK_TOP5.map((f) => ({ code: f.code, name: f.name, count: 0 }));
+
+  //Build menu list
+  const menuItems = useMemo(
+    () =>
+      [
+        { value: "", label: "Alla orter" },
+        { value: "remote", label: "Distans (remote)" },
+        ...top5.map((m) => ({ value: m.code, label: m.name })),
+      ] as { value: string; label: string }[],
+    [top5]
+  );
+
+  //Push selection to URL
   const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
     p.delete("offset");
@@ -85,45 +113,66 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const items: AFListItem[] = [
-    { value: "", label: "Alla orter", selected: false, lang: "sv" },
-    { value: "remote", label: "Distans (remote)", selected: false, lang: "sv" },
-    ...municipalities.map<AFListItem>((m) => ({
-      value: m.code,
-      label: `${m.name} (${m.count})`,
-      text: `${m.name} (${m.count})`,
-      selected: false,
-      lang: "sv",
-    })),
-  ];
+  //Apply menu click+close
+  const handleSelect = (val: string) => {
+    if (val === "remote") updateUrl(undefined, true);
+    else if (val) updateUrl(val);
+    else updateUrl();
+    setOpen(false);
+  };
 
-  const usp = new URLSearchParams(location.search);
-  const selectedValue =
-    usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
+  // Close on outside click / Esc
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!wrapRef.current) return;
+      if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
 
+  //UI: single yellow trugger + dark popover
   return (
-    <DigiFormSelectFilter
-      {...({
-        afLabel: "Efter plats",
-        afItems: items,
-        afValue: selectedValue,
-        afIsLoading: loading,
-        onAfSelect: (e: any) => {
-          const val = e?.detail?.value as string | undefined;
-          if (val === "remote") updateUrl(undefined, true);
-          else if (val) updateUrl(val);
-          else updateUrl();
-        },
-        items,
-        value: items.filter((i) => i.value === selectedValue),
-        isLoading: loading,
-        onValueChange: (vals: AFListItem[]) => {
-          const val = vals?.[0]?.value as string | undefined;
-          if (val === "remote") updateUrl(undefined, true);
-          else if (val) updateUrl(val);
-          else updateUrl();
-        },
-      } as any)}
-    />
+    <div className="location-filter" ref={wrapRef}>
+      {/* ONLY the yellow text trigger */}
+      <button
+        type="button"
+        className="filter-label"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        disabled={loading}
+      >
+        Efter plats <span aria-hidden>{open ? "▴" : "▾"}</span>
+      </button>
+
+      {/* Popover under the label */}
+      <div
+        className={`filter-menu ${open ? "" : "hidden"}`}
+        role="menu"
+        aria-label="Välj plats"
+      >
+        {menuItems.map((o) => {
+          const active = selectedValue === o.value;
+          return (
+            <button
+              key={o.value || "all"}
+              role="menuitemradio"
+              aria-checked={active}
+              className={active ? "menu-item-active" : undefined}
+              onClick={() => handleSelect(o.value)}
+              type="button"
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 };
