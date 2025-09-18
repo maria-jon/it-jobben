@@ -1,0 +1,76 @@
+.location-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+.pill-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 6px 36px 6px 12px;
+  background: #0e2a2f;
+  color: #e9fff5;
+  box-shadow: 0 0 0 1px #2c5d57 inset;
+}
+
+.pill-select-wrap::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.pill-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  min-width: 220px;
+  cursor: pointer;
+}
+
+.pill-select:focus {
+  outline: none;
+}
+
+.city-chips {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.city-chip {
+  border-radius: 9999px;
+  padding: 6px 10px;
+  background: #0e2a2f;
+  color: #e9fff5;
+  box-shadow: 0 0 0 1px #2c5d57 inset;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.05s ease-in-out;
+}
+
+.city-chip:hover {
+  transform: translateY(-1px);
+}
+
+.city-chip[aria-pressed="true"] {
+  background: #1f6f62;
+  box-shadow: 0 0 0 1px #89dbc7 inset;
+}

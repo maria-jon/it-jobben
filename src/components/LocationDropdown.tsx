@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { get } from "../services/serviceBase";
+import "./LocationDropdown.css";
 
 type Municipality = { code: string; name: string; count: number };
 
@@ -59,10 +60,12 @@ export const LocationDropdown = () => {
     })();
   }, [location.search, baseURL]);
 
+  // Current selection from URL
   const usp = new URLSearchParams(location.search);
   const selectedValue =
     usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
 
+  // Options for the <select>
   const options = useMemo(
     () => [
       { value: "", label: "Alla orter" },
@@ -75,6 +78,10 @@ export const LocationDropdown = () => {
     [municipalities]
   );
 
+  // Top 5 chips (by count)
+  const topCities = useMemo(() => municipalities.slice(0, 5), [municipalities]);
+
+  // URL updater
   const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
     p.delete("offset");
@@ -91,32 +98,85 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+  const handleSelect: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     const val = e.target.value;
     if (val === "remote") updateUrl(undefined, true);
     else if (val) updateUrl(val);
     else updateUrl();
   };
 
+  const handleChip = (val: string) => {
+    if (val === "remote") updateUrl(undefined, true);
+    else if (val) updateUrl(val);
+    else updateUrl();
+  };
+
   return (
-    <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
-      <label htmlFor="location-select" style={{ fontWeight: 600 }}>
+    <div className="location-filter" aria-label="Efter plats">
+      {/* Accessible label kept for screen readers */}
+      <label className="visually-hidden" htmlFor="location-select">
         Efter plats
       </label>
-      <select
-        id="location-select"
-        value={selectedValue}
-        onChange={handleChange}
-        disabled={loading}
-        aria-busy={loading}
-        style={{ minWidth: 260, padding: "6px 10px" }}
-      >
-        {options.map((o) => (
-          <option key={o.value || "all"} value={o.value}>
-            {o.label}
-          </option>
+
+      {/* Pill-styled select */}
+      <span className="pill-select-wrap">
+        <select
+          className="pill-select"
+          id="location-select"
+          value={selectedValue}
+          onChange={handleSelect}
+          disabled={loading}
+          aria-busy={loading}
+          aria-label="Efter plats"
+        >
+          {options.map((o) => (
+            <option key={o.value || "all"} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </span>
+
+      {/* Quick chips: top 5 cities */}
+      <div className="city-chips" role="group" aria-label="Snabbval ort">
+        {/* Remote chip first */}
+        <button
+          type="button"
+          className="city-chip"
+          aria-pressed={selectedValue === "remote"}
+          onClick={() => handleChip("remote")}
+          disabled={loading}
+          title="Distans (remote)"
+        >
+          Distans
+        </button>
+
+        {topCities.map((m) => (
+          <button
+            key={m.code}
+            type="button"
+            className="city-chip"
+            aria-pressed={selectedValue === m.code}
+            onClick={() => handleChip(m.code)}
+            disabled={loading}
+            title={m.name}
+          >
+            {m.name}
+          </button>
         ))}
-      </select>
+
+        {/* All chip */}
+        <button
+          type="button"
+          className="city-chip"
+          aria-pressed={selectedValue === ""}
+          onClick={() => handleChip("")}
+          disabled={loading}
+          title="Alla orter"
+        >
+          Alla
+        </button>
+      </div>
     </div>
   );
 };
