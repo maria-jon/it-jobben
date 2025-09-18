@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  DigiFormSelectFilter,
-  type IListItem,
-} from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
 
 type Municipality = { code: string; name: string; count: number };
@@ -67,23 +63,17 @@ export const LocationDropdown = () => {
   const selectedValue =
     usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
 
-  // Build items in AF format (text + value)
-  const items: IListItem[] = useMemo(
+  const options = useMemo(
     () => [
-      { value: "", text: "Alla orter" },
-      { value: "remote", text: "Distans (remote)" },
-      ...municipalities.map<IListItem>((m) => ({
+      { value: "", label: "Alla orter" },
+      { value: "remote", label: "Distans (remote)" },
+      ...municipalities.map((m) => ({
         value: m.code,
-        text: `${m.name} (${m.count})`,
+        label: `${m.name} (${m.count})`,
       })),
     ],
     [municipalities]
   );
-
-  // DigiFormSelectFilter expects value as IListItem[]
-  const selectedItems: IListItem[] = selectedValue
-    ? items.filter((i) => i.value === selectedValue)
-    : [];
 
   const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
@@ -101,18 +91,32 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
+  const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+    const val = e.target.value;
+    if (val === "remote") updateUrl(undefined, true);
+    else if (val) updateUrl(val);
+    else updateUrl();
+  };
+
   return (
-    <DigiFormSelectFilter
-      label="Efter plats"
-      items={items}
-      value={selectedItems}
-      isLoading={loading}
-      onValueChange={(vals: IListItem[]) => {
-        const val = vals?.[0]?.value;
-        if (val === "remote") updateUrl(undefined, true);
-        else if (val) updateUrl(val);
-        else updateUrl();
-      }}
-    />
+    <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+      <label htmlFor="location-select" style={{ fontWeight: 600 }}>
+        Efter plats
+      </label>
+      <select
+        id="location-select"
+        value={selectedValue}
+        onChange={handleChange}
+        disabled={loading}
+        aria-busy={loading}
+        style={{ minWidth: 260, padding: "6px 10px" }}
+      >
+        {options.map((o) => (
+          <option key={o.value || "all"} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };
