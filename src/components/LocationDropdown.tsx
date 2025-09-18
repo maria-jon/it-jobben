@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { get } from "../services/serviceBase";
 import "./LocationDropdown.css";
 
+//Server-provider facet shape for a municipality
 type Municipality = { code: string; name: string; count: number };
 
+//Helper: append query params to base url
 function joinUrl(base: string, extra?: string) {
   if (!extra || !extra.trim()) return base;
   const e = extra.trim();
@@ -15,6 +17,15 @@ function joinUrl(base: string, extra?: string) {
   return base + (base.includes("?") ? `&${e}` : `?${e}`);
 }
 
+//Fallback cities if facets are empty
+const FALLBACK_TOP5 = [
+  { code: "0180", name: "Stockholm" },
+  { code: "1480", name: "Göteborg" },
+  { code: "1280", name: "Malmö" },
+  { code: "0380", name: "Uppsala" },
+  { code: "1980", name: "Västerås" },
+];
+
 export const LocationDropdown = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,7 +33,10 @@ export const LocationDropdown = () => {
 
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
+  //Fetch facets when URL changes
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -30,7 +44,6 @@ export const LocationDropdown = () => {
         const params = new URLSearchParams(location.search);
         params.delete("municipality");
         params.delete("offset");
-
         const url = joinUrl(
           baseURL,
           `${params.toString()}&limit=0&facets=municipality`
@@ -49,10 +62,11 @@ export const LocationDropdown = () => {
           count: Number(b.count ?? b.doc_count ?? 0),
         }));
 
+        //Most results first
         rows.sort((a, b) => b.count - a.count);
         setMunicipalities(rows);
-      } catch (err) {
-        console.error("Failed to fetch municipality facets:", err);
+      } catch {
+        //Safe fallback
         setMunicipalities([]);
       } finally {
         setLoading(false);
@@ -60,28 +74,29 @@ export const LocationDropdown = () => {
     })();
   }, [location.search, baseURL]);
 
-  // Current selection from URL
+  //Read current selection from URL
   const usp = new URLSearchParams(location.search);
   const selectedValue =
     usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
 
-  // Options for the <select>
-  const options = useMemo(
-    () => [
-      { value: "", label: "Alla orter" },
-      { value: "remote", label: "Distans (remote)" },
-      ...municipalities.map((m) => ({
-        value: m.code,
-        label: `${m.name} (${m.count})`,
-      })),
-    ],
-    [municipalities]
+  //Choose top 5 cities
+  const top5 =
+    municipalities.length > 0
+      ? municipalities.slice(0, 5)
+      : FALLBACK_TOP5.map((f) => ({ code: f.code, name: f.name, count: 0 }));
+
+  //Build menu list
+  const menuItems = useMemo(
+    () =>
+      [
+        { value: "", label: "Alla orter" },
+        { value: "remote", label: "Distans (remote)" },
+        ...top5.map((m) => ({ value: m.code, label: m.name })),
+      ] as { value: string; label: string }[],
+    [top5]
   );
 
-  // Top 5 chips (by count)
-  const topCities = useMemo(() => municipalities.slice(0, 5), [municipalities]);
-
-  // URL updater
+  //Push selection to URL
   const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
     p.delete("offset");
@@ -98,84 +113,65 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const handleSelect: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
-    const val = e.target.value;
+  //Apply menu click+close
+  const handleSelect = (val: string) => {
     if (val === "remote") updateUrl(undefined, true);
     else if (val) updateUrl(val);
     else updateUrl();
+    setOpen(false);
   };
 
-  const handleChip = (val: string) => {
-    if (val === "remote") updateUrl(undefined, true);
-    else if (val) updateUrl(val);
-    else updateUrl();
-  };
+  // Close on outside click / Esc
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!wrapRef.current) return;
+      if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
 
+  //UI: single yellow trugger + dark popover
   return (
-    <div className="location-filter" aria-label="Efter plats">
-      {/* Accessible label kept for screen readers */}
-      <label className="visually-hidden" htmlFor="location-select">
-        Efter plats
-      </label>
+    <div className="location-filter" ref={wrapRef}>
+      {/* ONLY the yellow text trigger */}
+      <button
+        type="button"
+        className="filter-label"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        disabled={loading}
+      >
+        Efter plats <span aria-hidden>{open ? "▴" : "▾"}</span>
+      </button>
 
-      {/* Pill-styled select */}
-      <span className="pill-select-wrap">
-        <select
-          className="pill-select"
-          id="location-select"
-          value={selectedValue}
-          onChange={handleSelect}
-          disabled={loading}
-          aria-busy={loading}
-          aria-label="Efter plats"
-        >
-          {options.map((o) => (
-            <option key={o.value || "all"} value={o.value}>
+      {/* Popover under the label */}
+      <div
+        className={`filter-menu ${open ? "" : "hidden"}`}
+        role="menu"
+        aria-label="Välj plats"
+      >
+        {menuItems.map((o) => {
+          const active = selectedValue === o.value;
+          return (
+            <button
+              key={o.value || "all"}
+              role="menuitemradio"
+              aria-checked={active}
+              className={active ? "menu-item-active" : undefined}
+              onClick={() => handleSelect(o.value)}
+              type="button"
+            >
               {o.label}
-            </option>
-          ))}
-        </select>
-      </span>
-
-      {/* Quick chips: top 5 cities */}
-      <div className="city-chips" role="group" aria-label="Snabbval ort">
-        {/* Remote chip first */}
-        <button
-          type="button"
-          className="city-chip"
-          aria-pressed={selectedValue === "remote"}
-          onClick={() => handleChip("remote")}
-          disabled={loading}
-          title="Distans (remote)"
-        >
-          Distans
-        </button>
-
-        {topCities.map((m) => (
-          <button
-            key={m.code}
-            type="button"
-            className="city-chip"
-            aria-pressed={selectedValue === m.code}
-            onClick={() => handleChip(m.code)}
-            disabled={loading}
-            title={m.name}
-          >
-            {m.name}
-          </button>
-        ))}
-
-        {/* All chip */}
-        <button
-          type="button"
-          className="city-chip"
-          aria-pressed={selectedValue === ""}
-          onClick={() => handleChip("")}
-          disabled={loading}
-          title="Alla orter"
-        >
-          Alla
-        </button>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

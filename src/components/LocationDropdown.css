@@ -1,76 +1,66 @@
 .location-filter {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 10px;
 }
 
-.visually-hidden {
-  position: absolute !important;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
-  clip: rect(1px, 1px, 1px, 1px);
-  white-space: nowrap;
-}
-
-.pill-select-wrap {
-  position: relative;
+.filter-label {
   display: inline-flex;
   align-items: center;
-  border-radius: 9999px;
-  padding: 6px 36px 6px 12px;
-  background: #0e2a2f;
-  color: #e9fff5;
-  box-shadow: 0 0 0 1px #2c5d57 inset;
+  gap: 6px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ba9c3b;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  user-select: none;
+}
+.filter-label:focus {
+  outline: none;
+  text-decoration: underline;
 }
 
-.pill-select-wrap::after {
-  content: "▾";
+.filter-menu {
   position: absolute;
-  right: 12px;
-  pointer-events: none;
-  opacity: 0.9;
+  left: 0;
+  top: calc(100% + 8px);
+  min-width: 260px;
+  font-size: 1rem;
+  background: #0f2428;
+  color: #e9fff5;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid #2c5d57;
+  z-index: 40;
+  padding: 8px 0;
+}
+.filter-menu.hidden {
+  display: none;
 }
 
-.pill-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+.filter-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
   background: transparent;
   border: 0;
-  color: inherit;
-  font: inherit;
-  padding: 0;
-  min-width: 220px;
   cursor: pointer;
+  font: inherit;
+  color: inherit;
 }
-
-.pill-select:focus {
+.filter-menu button:hover,
+.filter-menu button:focus {
+  background: #17383d;
   outline: none;
 }
 
-.city-chips {
-  display: inline-flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.city-chip {
-  border-radius: 9999px;
-  padding: 6px 10px;
-  background: #0e2a2f;
-  color: #e9fff5;
-  box-shadow: 0 0 0 1px #2c5d57 inset;
-  cursor: pointer;
-  line-height: 1;
-  transition: transform 0.05s ease-in-out;
-}
-
-.city-chip:hover {
-  transform: translateY(-1px);
-}
-
-.city-chip[aria-pressed="true"] {
-  background: #1f6f62;
-  box-shadow: 0 0 0 1px #89dbc7 inset;
+.menu-item-active::after {
+  content: "✓";
+  float: right;
+  opacity: 0.9;
 }
