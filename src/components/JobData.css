@@ -1,0 +1,15 @@
+/* rect[fill] {
+  fill: var(--digi--global--color--cta--link--base);
+} */
+
+rect[fill] {
+  fill: var(--digi--layout-block--background--primary);
+}
+
+.sc-digi-bar-chart-h .table.sc-digi-bar-chart {
+    background: transparent;
+}
+
+.sc-digi-bar-chart-h g.tick text {
+    fill: var(--digi--color--text--primary, --digi--color--text--primary);
+}
