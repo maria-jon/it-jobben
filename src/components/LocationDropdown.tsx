@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
-import { DigiContextMenu } from "@digi/arbetsformedlingen-react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
 
-// Join base URL and extra query string properly
-// Handles if extra starts with ? or & or neither
-// Also handles if base already has ? or not
+type Municipality = { code: string; name: string; count: number };
+
+type AFListItem = {
+  value: string;
+  label: string;
+  text?: string;
+  selected?: boolean;
+  lang?: string;
+  dir?: "ltr" | "rtl";
+};
+
 function joinUrl(base: string, extra?: string) {
   if (!extra || !extra.trim()) return base;
   const e = extra.trim();
@@ -16,144 +24,106 @@ function joinUrl(base: string, extra?: string) {
   return base + (base.includes("?") ? `&${e}` : `?${e}`);
 }
 
-type Kommun = { kod: string; namn: string; antal: number };
-
 export const LocationDropdown = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const baseURL = import.meta.env.VITE_BASE_URL as string;
 
-  const urlParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search]
-  );
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [kommuner, setKommuner] = useState<Kommun[]>([]);
-  const [laddar, setLaddar] = useState(true);
-  const [visaAlla, setVisaAlla] = useState(false);
-
-  // Fetch municipalities facet on mount and when search changes
   useEffect(() => {
     (async () => {
-      setLaddar(true);
+      setLoading(true);
       try {
         const params = new URLSearchParams(location.search);
         params.delete("municipality");
         params.delete("offset");
+
         const url = joinUrl(
           baseURL,
           `${params.toString()}&limit=0&facets=municipality`
         );
         const data = await get<any>(url);
 
-        console.debug("facets.raw:", data?.facets);
-
-        // Try to find facets in different possible structures
         const buckets =
           data?.facets?.municipality ??
           data?.facets?.municipalities ??
           data?.aggregations?.municipality ??
           [];
 
-        console.debug("facets.municipality buckets:", buckets);
-
-        const rows: Kommun[] = buckets.map((b: any) => ({
-          kod: String(b.id ?? b.value ?? b.code ?? ""),
-          namn: String(b.label ?? b.name ?? b.title ?? b.id ?? ""),
-          antal: Number(b.count ?? b.doc_count ?? 0),
+        const rows: Municipality[] = buckets.map((b: any) => ({
+          code: String(b.id ?? b.value ?? b.code ?? ""),
+          name: String(b.label ?? b.name ?? b.title ?? b.id ?? ""),
+          count: Number(b.count ?? b.doc_count ?? 0),
         }));
 
-        rows.sort((a, b) => b.antal - a.antal);
-        setKommuner(rows);
-      } catch (e) {
-        console.error("Kunde inte hämta kommun-facet:", e);
-        setKommuner([]);
+        rows.sort((a, b) => b.count - a.count);
+        setMunicipalities(rows);
+      } catch (err) {
+        console.error("Failed to fetch municipality facets:", err);
+        setMunicipalities([]);
       } finally {
-        setLaddar(false);
+        setLoading(false);
       }
     })();
   }, [location.search, baseURL]);
 
-  //Add or update municipality or remote in URL
-  // Remove offset (go to first page)
-  const sättKommun = (kod: string) => {
+  const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
-    p.delete("remote");
-    p.set("municipality", kod);
     p.delete("offset");
+    if (municipality) {
+      p.delete("remote");
+      p.set("municipality", municipality);
+    } else if (isRemote) {
+      p.delete("municipality");
+      p.set("remote", "true");
+    } else {
+      p.delete("municipality");
+      p.delete("remote");
+    }
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const sättDistans = () => {
-    const p = new URLSearchParams(location.search);
-    p.delete("municipality");
-    p.set("remote", "true");
-    p.delete("offset");
-    navigate(`/search?${p.toString()}`, { replace: true });
-  };
-
-  const rensa = () => {
-    const p = new URLSearchParams(location.search);
-    p.delete("municipality");
-    p.delete("remote");
-    p.delete("offset");
-    navigate(`/search?${p.toString()}`, { replace: true });
-  };
-
-  // Meny items
-  const synligaKommuner = visaAlla ? kommuner : kommuner.slice(0, 20);
-
-  const meny = [
-    { id: 0, title: "Alla orter", onClick: rensa },
-    { id: 1, title: "Distans (remote)", onClick: sättDistans },
-    {
-      id: 2,
-      title: "Sök ort …",
-      onClick: () => {
-        const input = window
-          .prompt("Skriv ort/kommun (t.ex. Lund, Stockholm):")
-          ?.trim();
-        if (!input) return;
-        const needle = input.toLocaleLowerCase("sv-SE");
-        const match = kommuner.find((k) =>
-          k.namn.toLocaleLowerCase("sv-SE").includes(needle)
-        );
-        if (match) sättKommun(match.kod);
-        else window.alert(`Hittade ingen kommun som matchar: ${input}`);
-      },
-    },
-
-    // Add municipalities from facet
-    ...synligaKommuner.map((k, i) => ({
-      id: 100 + i,
-      title: `${k.namn} (${k.antal})`,
-      onClick: () => sättKommun(k.kod),
+  const items: AFListItem[] = [
+    { value: "", label: "Alla orter", selected: false, lang: "sv" },
+    { value: "remote", label: "Distans (remote)", selected: false, lang: "sv" },
+    ...municipalities.map<AFListItem>((m) => ({
+      value: m.code,
+      label: `${m.name} (${m.count})`,
+      text: `${m.name} (${m.count})`,
+      selected: false,
+      lang: "sv",
     })),
-    ...(kommuner.length > 20 && !visaAlla
-      ? [{ id: 9999, title: "Visa fler…", onClick: () => setVisaAlla(true) }]
-      : []),
   ];
 
-  // Title for dropdown
-  const aktuellTitel = (() => {
-    const muni = urlParams.get("municipality");
-    const remote = urlParams.get("remote");
-    if (remote === "true") return "Ort: Distans";
-    if (muni) {
-      const träff = kommuner.find((k) => k.kod === muni);
-      return träff ? `Ort: ${träff.namn}` : "Ort";
-    }
-    return laddar ? "Ort (laddar…)" : "Ort";
-  })();
+  const usp = new URLSearchParams(location.search);
+  const selectedValue =
+    usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
 
   return (
-    <DigiContextMenu
-      afTitle={aktuellTitel}
-      afMenuItems={meny}
-      onAfChangeItem={(e: CustomEvent) => {
-        const item = (e as any).detail?.item;
-        item?.onClick?.();
-      }}
+    <DigiFormSelectFilter
+      {...({
+        afLabel: "Efter plats",
+        afItems: items,
+        afValue: selectedValue,
+        afIsLoading: loading,
+        onAfSelect: (e: any) => {
+          const val = e?.detail?.value as string | undefined;
+          if (val === "remote") updateUrl(undefined, true);
+          else if (val) updateUrl(val);
+          else updateUrl();
+        },
+        items,
+        value: items.filter((i) => i.value === selectedValue),
+        isLoading: loading,
+        onValueChange: (vals: AFListItem[]) => {
+          const val = vals?.[0]?.value as string | undefined;
+          if (val === "remote") updateUrl(undefined, true);
+          else if (val) updateUrl(val);
+          else updateUrl();
+        },
+      } as any)}
     />
   );
 };
