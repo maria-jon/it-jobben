@@ -85,7 +85,7 @@ export const JobData = () => {
   };
 
   return (
-    <div style={{ width: "1200px", height: "600px" }}> 
+    <div style={{ width: "100%", height: "600px"}}> 
       <DigiBarChart
         afChartData={chartData}
         afHeadingLevel={"H2"}

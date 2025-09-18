@@ -5,3 +5,7 @@
 rect[fill] {
   fill: var(--digi--layout-block--background--primary);
 }
+
+.sc-digi-bar-chart-h .table.sc-digi-bar-chart {
+    background: transparent;
+}
