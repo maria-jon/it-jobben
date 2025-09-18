@@ -1,19 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DigiFormSelectFilter } from "@digi/arbetsformedlingen-react";
 import { get } from "../services/serviceBase";
 
 type Municipality = { code: string; name: string; count: number };
-
-type AFListItem = {
-  value: string;
-  label: string;
-  text?: string;
-  selected?: boolean;
-  lang?: string;
-  dir?: "ltr" | "rtl";
-};
 
 function joinUrl(base: string, extra?: string) {
   if (!extra || !extra.trim()) return base;
@@ -32,6 +23,7 @@ export const LocationDropdown = () => {
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loading, setLoading] = useState(true);
 
+  
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -69,6 +61,26 @@ export const LocationDropdown = () => {
     })();
   }, [location.search, baseURL]);
 
+  
+  const usp = new URLSearchParams(location.search);
+  const selected =
+    usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
+  const value: string[] = selected ? [selected] : [];
+
+  
+  const items = useMemo(
+    () => [
+      { value: "", text: "Alla orter" },
+      { value: "remote", text: "Distans (remote)" },
+      ...municipalities.map((m) => ({
+        value: m.code,
+        text: `${m.name} (${m.count})`,
+      })),
+    ],
+    [municipalities]
+  );
+
+
   const updateUrl = (municipality?: string, isRemote?: boolean) => {
     const p = new URLSearchParams(location.search);
     p.delete("offset");
@@ -85,45 +97,25 @@ export const LocationDropdown = () => {
     navigate(`/search?${p.toString()}`, { replace: true });
   };
 
-  const items: AFListItem[] = [
-    { value: "", label: "Alla orter", selected: false, lang: "sv" },
-    { value: "remote", label: "Distans (remote)", selected: false, lang: "sv" },
-    ...municipalities.map<AFListItem>((m) => ({
-      value: m.code,
-      label: `${m.name} (${m.count})`,
-      text: `${m.name} (${m.count})`,
-      selected: false,
-      lang: "sv",
-    })),
-  ];
-
-  const usp = new URLSearchParams(location.search);
-  const selectedValue =
-    usp.get("remote") === "true" ? "remote" : usp.get("municipality") ?? "";
-
   return (
     <DigiFormSelectFilter
-      {...({
-        afLabel: "Efter plats",
-        afItems: items,
-        afValue: selectedValue,
-        afIsLoading: loading,
-        onAfSelect: (e: any) => {
-          const val = e?.detail?.value as string | undefined;
-          if (val === "remote") updateUrl(undefined, true);
-          else if (val) updateUrl(val);
-          else updateUrl();
-        },
-        items,
-        value: items.filter((i) => i.value === selectedValue),
-        isLoading: loading,
-        onValueChange: (vals: AFListItem[]) => {
-          const val = vals?.[0]?.value as string | undefined;
-          if (val === "remote") updateUrl(undefined, true);
-          else if (val) updateUrl(val);
-          else updateUrl();
-        },
-      } as any)}
+      label="Efter plats"
+      afLabel="Efter plats"
+      items={items}
+      value={value} 
+      isLoading={loading}
+      onAfSelect={(e: any) => {
+        const val = e?.detail?.value as string | undefined;
+        if (val === "remote") updateUrl(undefined, true);
+        else if (val) updateUrl(val);
+        else updateUrl();
+      }}
+      onValueChange={(vals: string[]) => {
+        const val = vals?.[0];
+        if (val === "remote") updateUrl(undefined, true);
+        else if (val) updateUrl(val);
+        else updateUrl();
+      }}
     />
   );
 };
