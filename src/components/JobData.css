@@ -1,0 +1,7 @@
+/* rect[fill] {
+  fill: var(--digi--global--color--cta--link--base);
+} */
+
+rect[fill] {
+  fill: var(--digi--layout-block--background--primary);
+}
