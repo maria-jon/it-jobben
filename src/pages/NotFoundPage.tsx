@@ -1,4 +1,15 @@
-import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { isRouteErrorResponse, useRouteError, useNavigate } from "react-router-dom";
+import { 
+  DigiLayoutBlock,
+  DigiTypography,
+  DigiTypographyHeadingJumbo,
+  DigiLayoutContainer,
+  DigiLink
+} from "@digi/arbetsformedlingen-react";
+import { 
+  TypographyHeadingJumboLevel, 
+  TypographyHeadingJumboVariation 
+} from "@digi/arbetsformedlingen";
 
 export default function NotFoundPage() {
   const err = useRouteError();
@@ -14,13 +25,29 @@ export default function NotFoundPage() {
     message = err.message;
   }
 
+  const navigate = useNavigate();
+
   return (
-    <section>
-      <h1>{title}</h1>
-      <p>{message}</p>
-      <p>
-        <Link to="/">← Back home</Link>
-      </p>
-    </section>
+  <DigiLayoutBlock afVerticalPadding afMarginTop className="hero">
+    <DigiTypography>
+      <DigiTypographyHeadingJumbo
+        afText={title}
+        afLevel={TypographyHeadingJumboLevel.H1}
+        afVariation={TypographyHeadingJumboVariation.PRIMARY}
+      />
+      <DigiLink
+          afHref="/"
+          afOverrideLink={true}
+          afAriaLabel="Gå tillbaka"
+          onAfOnClick={() => navigate(-1)}
+          hideVisitedColor
+        >	 
+          ← Tillbaka
+      </DigiLink>
+      <DigiLayoutContainer afVerticalPadding afNoGutter>
+        <p>{message}</p>
+      </DigiLayoutContainer>
+    </DigiTypography>
+  </DigiLayoutBlock>
   );
 }

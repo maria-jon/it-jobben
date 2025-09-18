@@ -84,30 +84,7 @@ export default function AdPage() {
   }, [id]);
 
   if (loading) return <p>Laddar…</p>;
-  if (error || !job) {
-    return (
-      <>
-        <DigiLink
-          afHref="/"
-          afOverrideLink
-          afAriaLabel="Gå tillbaka"
-          onAfOnClick={() => navigate(-1)}
-        >
-          ← Tillbaka
-        </DigiLink>
-        <DigiLayoutBlock afVariation={LayoutBlockVariation.PRIMARY}>
-          <DigiInfoCard
-            afType={InfoCardType.RELATED}
-            afHeading="Kunde inte visa annonsen"
-            afBorderPosition={InfoCardBorderPosition.LEFT}
-            afVariation={InfoCardVariation.PRIMARY}
-          >
-            <p role="alert">{error}</p>
-          </DigiInfoCard>
-        </DigiLayoutBlock>
-      </>
-    )
-  }
+  if (error || !job) return;
   if (!job) return null;
 
   // Arrays for must-haves
@@ -175,6 +152,7 @@ export default function AdPage() {
         afOverrideLink={true}
         afAriaLabel="Gå tillbaka"
         onAfOnClick={() => navigate(-1)}
+        hideVisitedColor
       >	 
         ← Tillbaka
       </DigiLink>
