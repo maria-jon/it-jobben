@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getCountForQuery } from "../services/popularJobsService";
 import { DigiBarChart } from "@digi/arbetsformedlingen-react";
 import "../components/JobData.css"
+import { BarChartVariation } from "@digi/arbetsformedlingen";
 
 export const JobData = () => {
   const [counts, setCounts] = useState<{ [key: string]: number }>({});
@@ -89,25 +90,9 @@ export const JobData = () => {
       <DigiBarChart
         afChartData={chartData}
         afHeadingLevel={"H2"}
-        afVariation={"horizontal"} 
+        afVariation={BarChartVariation.Horizontal} 
         style={{ width: "100%", height: "100%" }} 
       />
   </div>
   );
 };
-
-  // <div style={{ overflowX: "auto" }}>
-  //     <DigiLayoutBlock 
-  //       afVerticalPadding 
-  //       afMarginTop 
-  //       style={{ width: "100%", height: "1000px"}} 
-  //       >
-  //     <DigiBarChart
-  //       afChartData={chartData}
-  //       afHeadingLevel={"H2"}
-  //       afVariation={"horizontal"} 
-  //       style={{ width: "100%", height: "1000px" }} 
-  //     >
-  //     </DigiBarChart>
-  //   </DigiLayoutBlock>
-  // </div>
