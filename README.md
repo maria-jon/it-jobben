@@ -32,6 +32,11 @@ This project was done as a front-end school assigment for Medieinstitutet Sweden
 - Arbetsförmedlingen Designsystem version 31.3.0
 
 ## Screenshots
+![Start page](/public/screenshots/start-page.png)
+![Start page](/public/screenshots/filter-search.png)
+![Start page](/public/screenshots/job-listing-1.png)
+![Start page](/public/screenshots/job-listing-2.png)
+
 
 ## Acknowledgements
 - [Arbetsförmedlingens desigmsystem](https://designsystem.arbetsformedlingen.se/)
