@@ -1,38 +1,43 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/6VsM7MHT)
-# Skapa en egen Platsbanken för ert drömscenario 
+# IT-jobben
 
-Dokumentation om Arbetsförmedlingens öppna data finns på https://jobtechdev.se. All öppna data från arbetsförmedlingen och andra offentliga organisationen går även att hitta direkt på dataportal.se. 
-I detta dokument ges två förslag på användningsfall som vi tror är lämpliga för studenter som vill utveckla en applikation på riktig data. All data som är öppna data får vem som helst använda utan att fråga myndigheten om lov, så ingen är begränsad till de exempel vi ger.
+Website made in React using Arbetsförmedlingens design system and JobSearch API.
+This project was done as a front-end school assigment for Medieinstitutet Sweden. 
 
-Läs först igenom kom-igång hjälpen 
+## Table of Contents
 
--  [Övergripande dokumentation API:etJobSearch](https://jobtechdev.se/sv/components/jobsearch)
--  [Kom-igång guide](https://gitlab.com/arbetsformedlingen/education/education-api/-/blob/main/GETTING_STARTED.md)
+- [Features](#features)
+- [Tech stack](#tech-stack)
+- [Screenshots](#screenshots)
+- [Acknowledgements](#acknowledgements)
+- [Authors](#authors)
 
-## Prova att utforska datan med vår interaktiva tjänst 
+## Features
 
-Görs genom att öppna Swagger-sidan för API:et (för att enkelt testa olika endpoints i API:et och läsa dokumentation för respektive endpoint): Search job ads (jobtechdev.se) 
+- Routing with start page, job search page, saved jobs, as well as a separate page for the job ads
+- Components made using digi-components from Arbetsförmedlingens Designsystem
+- Job ads are fetched from JobSearch API and displays information about the job listing
+- Only listing tech/IT jobs from JobSearch
+- Ability to save jobs for later
 
-## Uppgift 
+## Tech Stack
 
-Använd endpoint https://jobsearch.api.jobtechdev.se/ för att använda/söka bland befintliga annonser. 
-Det går även bra att använda historiska annonser om ni vill jämföra aktuella annonser med hur det har sett ut tidigare. Detta api finns här: Historical job ads (jobtechdev.se)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)
 
-Om möjligt, använd en grafisk presentation av era resultat genom t.ex. stapeldiagram eller linjegrafer.
+- Vite version 7.1.2
+- TypeScript version 5.8.3
+- React version 19.1.1
+- ESLint version 9.33.0
+- Axios version 1.11.0
+- React Router version 7.8.2
+- Arbetsförmedlingen Designsystem version 31.3.0
 
-**Observera**
-Er slutprodukt ska ej innehålla Arbetsförmedlingens logga eller färger. Anpassa gärna efter eget tycke och smak så att ni har en färgpalett och en god tanke bakom. 
+## Screenshots
 
-## Betygskriterier 
-
-### Need-to-have (G) 
-- Ni har hämtat data på ett strukturerat sätt med hjälp av antingen fetch eller axios. 
-- Ni har skapat en tjänst som ni använder för att hämta data. 
-- Ni använder react-koncept vi har pratat om för att göra datan tillgänglig (context, state, routing et.c.). 
-- Ni använder den syntax, namngivningsstandard samt skrivsätt som vi har lärt er.  
-- Ni använder designsystemet för presentation. 
-
-### Nice-to-have (Extra bonus) 
-- Styled components (som drar nytta av designsystemet) 
-- Grafisk presentation av datat 
-- Användning av custom hook där det finns möjlighet
+## Acknowledgements
+- [Arbetsförmedlingens desigmsystem](https://designsystem.arbetsformedlingen.se/)
+- [JobSearch API](https://gitlab.com/arbetsformedlingen/job-ads/jobsearch/jobsearch-api/-/tree/main)
+  
+## Authors
+- [@maria-jon](https://www.github.com/maria-jon)
+- [@AgnesWilson](https://github.com/AgnesWilson)
+- [@DulamaA](https://github.com/DulamaA)
